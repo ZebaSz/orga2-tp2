@@ -1,0 +1,11 @@
+.idea/
+cmake-build-debug/
+
+bin/
+
+tests/data/
+
+*.o
+src/tp2
+src/tools/diff
+src/bmp/example
