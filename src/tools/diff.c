@@ -52,11 +52,11 @@ int main(int argc, char* argv[]){
   // (1) leer imagenes
   BMP* bmp1 = bmp_read(opt.file1);
   BMP* bmp2 = bmp_read(opt.file2);
-  if( bmp1==0 || bmp1==0 )
+  if( bmp1==0 || bmp2==0 )
   { printf("ERROR: no se puede abrir el archivo\n"); return -1;}
   
   // (2) check tipo de archivo
-  if( ((BMPIH*)(bmp1->ih))->biSize != ((BMPIH*)(bmp1->ih))->biSize )
+  if( ((BMPIH*)(bmp1->ih))->biSize != ((BMPIH*)(bmp2->ih))->biSize )
   { printf("ERROR: tipo de archivo diferente\n"); return -1;}
   
   // (3) check tamaño del archivo
@@ -142,7 +142,7 @@ int main(int argc, char* argv[]){
       dataR[pos+2] = cmp(R1,R2,i,j,"R",&opt);
       dataR[pos+1] = dataR[pos+2];
       dataR[pos+0] = dataR[pos+2];
-      
+
       dataG[pos+2] = cmp(G1,G2,i,j,"G",&opt);
       dataG[pos+1] = dataG[pos+2];
       dataG[pos+0] = dataG[pos+2];

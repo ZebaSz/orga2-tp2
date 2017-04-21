@@ -22,8 +22,6 @@ makes:
 tp2: run.o tp2.o makes
 	gcc $(CFLAGS) tp2.o run.o filters/*.o bmp/*.o -o tp2 -lm
 	cp tp2 ../bin/
-	mkdir -p ../tests/solucion_catedra/
-	strip --strip-all tp2 -o ../tests/solucion_catedra/tp2
 	
 clean:
 	make -C bmp clean
