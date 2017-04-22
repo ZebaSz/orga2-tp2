@@ -37,9 +37,9 @@ set(BMP_FILES
 
 add_library(bmp ${BMP_FILES})
 
-add_executable(difftool ${DIFF_FILES})
-target_link_libraries(difftool bmp)
+add_executable(diff ${DIFF_FILES})
+target_link_libraries(diff bmp)
 add_executable(bmp_example src/bmp/example.c)
 target_link_libraries(bmp_example bmp)
-add_executable(orga2_tp2 ${SOURCE_FILES} ${FILTER_FILES})
-target_link_libraries(orga2_tp2 bmp)
+add_executable(tp2 ${SOURCE_FILES} ${FILTER_FILES})
+target_link_libraries(tp2 bmp)
