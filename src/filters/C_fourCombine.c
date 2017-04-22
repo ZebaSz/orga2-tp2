@@ -19,7 +19,7 @@ void C_fourCombine(uint8_t* src, uint32_t srcw, uint32_t srch,
             uint32_t offsetH = (h % 2 == 0) ? 0 : halfHeight;
             uint32_t offsetW = (w % 2 == 0) ? 0 : halfWidth;
             mDst[offsetH + (h >> 1)][offsetW + (w >> 1)] = mSrc[h][w];
-         }
+        }
     }
 }
 
