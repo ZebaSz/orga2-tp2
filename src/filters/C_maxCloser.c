@@ -29,17 +29,15 @@ void C_maxCloser(uint8_t* src, uint32_t srcw, uint32_t srch,
                 max.g = 0;
                 max.b = 0;
                 for(int32_t i = -3; i <= 3; i++){
-                    for(int32_t j = -3; j <= 3; j++){
-                        if(i != 0 || j != 0){
-                            if(mSrc[h + i][w + j].r > max.r){
-                                max.r = mSrc[h + i][w + j].r;
-                            }
-                            if(mSrc[h + i][w + j].g > max.g){
-                                max.g = mSrc[h + i][w + j].g;
-                            }
-                            if(mSrc[h + i][w + j].b > max.b){
-                                max.b = mSrc[h + i][w + j].b;
-                            }
+                    for(int32_t j = -3; j <= 3; j++) {
+                        if(mSrc[h + i][w + j].r > max.r) {
+                            max.r = mSrc[h + i][w + j].r;
+                        }
+                        if(mSrc[h + i][w + j].g > max.g) {
+                            max.g = mSrc[h + i][w + j].g;
+                        }
+                        if(mSrc[h + i][w + j].b > max.b) {
+                            max.b = mSrc[h + i][w + j].b;
                         }
                     }
                 }
