@@ -12,6 +12,9 @@ extern C_convertRGBtoYUV
 %define RGB_V_MASK_TOP 0x00000070FFFFFFA2
 %define RGB_V_MASK_BOT 0xFFFFFFEE00000000
 
+%define RGB_SHF_PRE_MASK 0x0080008000800000
+%define RGB_SHF_POST_MASK 0x0010008000800000
+
 %define YUV_R_MASK_TOP 0x0000000000000000 ; TODO
 %define YUV_R_MASK_BOT 0x0000000000000000 ; TODO
 %define YUV_G_MASK_TOP 0x0000000000000000 ; TODO
@@ -44,42 +47,40 @@ ret
 ; xmm0: input/output pixel chain
 ; xmm1-4 : input pixels
 ; xmm5-8 : output pixels
-; xmm9-11 : conversion masks
-; xmm12-15 : scratch
+; xmm9-13 : conversion masks
+; xmm14-15 : scratch
 
 ASM_convertRGBtoYUV:
-; ARMADO DE STACKFRAME
-push rbp
-mov rbp, rsp
-sub rsp, 8 ; necesario para alinear, modificar para agregar variables locales
-push rbx
-push r12
-push r13
-push r14
-push r15
-; /ARMADO DE STACKFRAME
-
 ; create masks
-mov r15, RGB_Y_MASK_TOP
-movq xmm9, r15
+mov rax, RGB_Y_MASK_TOP
+movq xmm9, rax
 pslldq xmm9, 8
-mov r15, RGB_Y_MASK_BOT
-movq xmm0, r15
+mov rax, RGB_Y_MASK_BOT
+movq xmm0, rax
 paddq xmm9, xmm0
 
-mov r15, RGB_U_MASK_TOP
-movq xmm10, r15
+mov rax, RGB_U_MASK_TOP
+movq xmm10, rax
 pslldq xmm10, 8
-mov r15, RGB_U_MASK_BOT
-movq xmm0, r15
+mov rax, RGB_U_MASK_BOT
+movq xmm0, rax
 paddq xmm10, xmm0
 
-mov r15, RGB_V_MASK_TOP
-movq xmm11, r15
+mov rax, RGB_V_MASK_TOP
+movq xmm11, rax
 pslldq xmm11, 8
-mov r15, RGB_V_MASK_BOT
-movq xmm0, r15
+mov rax, RGB_V_MASK_BOT
+movq xmm0, rax
 paddq xmm11, xmm0
+
+pxor xmm0, xmm0
+mov rax, RGB_SHF_PRE_MASK
+movq xmm12, rax
+punpcklwd xmm12, xmm0
+
+mov rax, RGB_SHF_POST_MASK
+movq xmm13, rax
+punpcklwd xmm13, xmm0
 
 mov eax, esi
 mul edx
@@ -115,9 +116,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new y value
-    add eax, 128
-    sar eax, 8
-    add eax, 16
     movd xmm5, eax
     pslldq xmm5, 4
 
@@ -126,9 +124,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new u value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm5, xmm15
     pslldq xmm5, 4
@@ -138,12 +133,13 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new v value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm5, xmm15
     pslldq xmm5, 4
+
+    paddd xmm5, xmm12
+    psrad xmm5, 8
+    paddd xmm5, xmm13
 
     ; SECOND PIXEL
     movdqu xmm15, xmm2 ; get the second pixel
@@ -151,9 +147,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new y value
-    add eax, 128
-    sar eax, 8
-    add eax, 16
     movd xmm6, eax
     pslldq xmm6, 4
 
@@ -162,9 +155,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new u value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm6, xmm15
     pslldq xmm6, 4
@@ -174,12 +164,13 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new v value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm6, xmm15
     pslldq xmm6, 4
+
+    paddd xmm6, xmm12
+    psrad xmm6, 8
+    paddd xmm6, xmm13
 
     ; THIRD PIXEL
     movdqu xmm15, xmm3 ; get the third pixel
@@ -187,9 +178,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new y value
-    add eax, 128
-    sar eax, 8
-    add eax, 16
     movd xmm7, eax
     pslldq xmm7, 4
 
@@ -198,9 +186,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new u value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm7, xmm15
     pslldq xmm7, 4
@@ -210,12 +195,13 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new v value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm7, xmm15
     pslldq xmm7, 4
+
+    paddd xmm7, xmm12
+    psrad xmm7, 8
+    paddd xmm7, xmm13
 
     ; FOURTH PIXEL
     movdqu xmm15, xmm4 ; get the fourth pixel
@@ -223,9 +209,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new y value
-    add eax, 128
-    sar eax, 8
-    add eax, 16
     movd xmm8, eax
     pslldq xmm8, 4
 
@@ -234,9 +217,6 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new y value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm8, xmm15
     pslldq xmm8, 4
@@ -246,12 +226,13 @@ ASM_convertRGBtoYUV_loop:
     phaddd xmm15, xmm15
     phaddd xmm15, xmm15 ; add components
     movd eax, xmm15 ; get dword with new v value
-    add eax, 128
-    sar eax, 8
-    add eax, 128
     movd xmm15, eax
     paddd xmm8, xmm15
     pslldq xmm8, 4
+
+    paddd xmm8, xmm12
+    psrad xmm8, 8
+    paddd xmm8, xmm13
 
     ; /CONVERSION
 
@@ -266,14 +247,4 @@ ASM_convertRGBtoYUV_loop:
     add r11, 4
     cmp r10, r11 ; for index < pixel amount
     ja ASM_convertRGBtoYUV_loop
-
-; DESARMADO DE STACKFRAME
-pop r15
-pop r14
-pop r13
-pop r12
-pop rbx
-add rsp, 8 ; necesario para alinear, modificar para agregar variables locales
-pop rbp
-; /DESARMADO DE STACKFRAME
 ret
