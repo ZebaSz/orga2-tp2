@@ -1,0 +1,46 @@
+\documentclass[10pt, a4paper, spanish]{article}
+\usepackage[paper=a4paper, left=1.5cm, right=1.5cm, bottom=1.5cm, top=3.5cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[]{caratula}
+\usepackage[pdfencoding=auto, colorlinks=true, linkcolor=blue]{hyperref}
+
+
+\newcommand\complejidad{\textbf{Complejidad}}
+\newcommand\justifcomp{\textbf{Justificación}}
+\newcommand\OdeLinea[1]{\Comment*[r]{$O(#1)$}}
+\newcommand\OdeBloque[1]{\Comment*[f]{$O(#1)$}}
+
+\newcommand{\TituloDis}[1]{
+  \vspace*{1ex}\par\noindent\textbf{\large #1}\par
+}
+
+\newcommand{\algoritmo}[3]{\hangindent=\parindent#1 (#2) \ifx#3\empty\else$\rightarrow$ res: #3\fi}
+
+\begin{document}
+
+
+% CARATULA
+\materia{Organización del Computador II}
+\submateria{Primer Cuatrimestre de 2017}
+\fecha{\today}
+\titulo{Trabajo Práctico 2}
+
+\integrante{?, ?}{?}{?}
+\integrante{?, ?}{?}{?}
+\integrante{Tarrío, Ignacio}{363/15}{itarrio@dc.uba.ar}
+
+\maketitle
+
+\tableofcontents
+\pagebreak
+
+\input{YUVconverter}
+
+\input{combinar}
+
+\input{zoom}
+
+\input{max}
+
+\end{document}
