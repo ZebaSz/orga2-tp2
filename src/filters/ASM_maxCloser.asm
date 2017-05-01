@@ -1,25 +1,31 @@
 global ASM_maxCloser
 extern C_maxCloser
 
-%define PIXEL_WHITE 0x00FFFFFF
-%define PIXEL_WHITE_D 0x00FFFFFF00FFFFFF
+%define PIXEL_WHITE 0xFFFFFF00
+%define PIXEL_WHITE_D 0xFFFFFF00FFFFFF00
 
 %define VAL_CMPL 0x0001000100010001
 
 %define pixel_size 4
 %define kernel_offset 3
-%define kernel_height 7
 
 ; rdi(uint8_t* src), esi(uint32_t srcw), edx(uint32_t srch),
 ; rcx(uint8_t* dst), r8d (uint32_t dstw), r9d(uint32_t dsth), xmm0(float val)
 
 ASM_maxCloser:
+push rbp
+mov rbp, rsp
+push rbx
+push r12
+push r13
+push r14
+push r15
 	mov esi, esi
-	mov edx, edx
+	mov ebx, edx
 
 	mov r15, rsi
 	sub r15, 4 ; Ancho - 4
-	mov r14, rdx
+	mov r14, rbx
 	sub r14, 4 ; Altura - 4
 	
 	xor r11, r11 ; R11 (Fila indice) = 0
@@ -27,15 +33,16 @@ ASM_maxCloser:
 	movdqu xmm6, xmm0
 	pslldq xmm6, 4
 	paddd xmm6, xmm0
-	pslldq xmm6, 4
-	paddd xmm6, xmm0 ; xmm6 = |0|val|val|val|
+	movdqu xmm7, xmm6
+	pslldq xmm6, 8
+	paddd xmm6, xmm7 ; xmm6 = |val|val|val|val|
 
 	mov rax, VAL_CMPL
 	movq xmm7, rax
 	pxor xmm15, xmm15
 	punpcklwd xmm7, xmm15
 	cvtdq2ps xmm7, xmm7
-	subps xmm7, xmm6 ; xmm7 = |1|1-val|1-val|1-val|
+	subps xmm7, xmm6 ; xmm7 = |1-val|1-val|1-val|1-val|
 
 	mov rax, PIXEL_WHITE_D
 	movq xmm8, rax
@@ -57,9 +64,9 @@ ASM_maxCloser:
 			mul r11
 			lea rax, [rcx + rax * pixel_size]
 			movdqu [rax + r12 * pixel_size], xmm8 ; Agregar en la imagen 4 pixeles blancos (contiguos) ya que estamos en las primeras filas o las ultimas(y sabemos que toda la fila es blanca)
+			add r12, 4 ; Aumentos en 4 el indice de columna (ya rellenamos 4 pixeles)
 			cmp r12, rsi
 			jge .aumentarFila
-			add r12, 4 ; Aumentos en 4 el indice de columna (ya rellenamos 4 pixeles)
 			jmp .filaBlanca
 
 		.filaNormal:
@@ -80,22 +87,19 @@ ASM_maxCloser:
 			.pintaMax:
 				; TODO: podriamos fijarnos si val es 0 en cuyo caso van los mismos pixeles en toda la imagen
 				pxor xmm1, xmm1
-				xor r10, r10
+				mov r10, -kernel_offset
 				.buscarMax:
-					mov rax, r10
-					add rax, r11
+					mov rax, r11
+					add rax, r10
 					mul rsi
 					lea rax, [rdi + rax * pixel_size]
 
-					mov rbx, r12
-					sub rbx, kernel_offset
-
-					movdqu xmm2, [rax + rbx * pixel_size] ; Agarro los 4 pixeles de la izq de la fila que estamos viendo del kernel
+					movdqu xmm2, [rax + r12 * pixel_size - kernel_offset * pixel_size] ; Agarro los 4 pixeles de la izq de la fila que estamos viendo del kernel
 					pmaxub xmm1, xmm2 ; Me quedo con los mayores
 					movdqu xmm2, [rax + r12 * pixel_size] ; Ahora agarramos los de la derecha
 					pmaxub xmm1, xmm2 ; De vuelta nos quedamos con los mayores
 					inc r10
-					cmp r10, kernel_height
+					cmp r10, kernel_offset
 					jle .buscarMax
 
 				; XMM1 = |Max1|Max2|Max3|Max4|
@@ -127,15 +131,32 @@ ASM_maxCloser:
 				
 				cvtps2dq xmm2, xmm2 ;paso a dword
 
+				packusdw xmm2, xmm2
+				packuswb xmm2, xmm2
+
+				movd r13d, xmm2
+
+				mov rax, rsi
+				mul r11
+				lea rax, [rcx + rax * pixel_size]
+				mov dword [rax + r12 * pixel_size], r13d ; Pintamos con el valor correcto
+
 				;pasar a dword a byte
 				;guardar en memoria
 
 			.aumentarColumna:
 				inc r12 
 				cmp r12, rsi
-				jle .filaNormal
+				jl .filaNormal
 		.aumentarFila:
 			inc r11
-			cmp r11, rdx
-			jle .filaLoop
+			cmp r11, rbx
+			jl .filaLoop
+
+pop r15
+pop r14
+pop r13
+pop r12
+pop rbx
+pop rbp
 ret
