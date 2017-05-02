@@ -21,7 +21,7 @@ push r13
 push r14
 push r15
 	mov esi, esi
-	mov ebx, edx
+	mov ebx, edx ; guardar para que no se borre al usar mul
 
 	mov r15, rsi
 	sub r15, 4 ; Ancho - 4
