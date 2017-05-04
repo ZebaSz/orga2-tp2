@@ -41,11 +41,11 @@ mov rax, CERO_FFS2_HIGH
 movq xmm0, rax
 paddq xmm14, xmm0
 
-movdqu xmm2, [rdi]; [4,3,2,1] 
-add rdi, FOUR_PIXELS_OFFSET
-movdqu xmm3, [rdi]; [8,7,6,5]
-movdqu xmm4, xmm2
-movdqu xmm5, xmm3
+;movdqu xmm2, [rdi]; [4,3,2,1] 
+;add rdi, FOUR_PIXELS_OFFSET
+;movdqu xmm3, [rdi]; [8,7,6,5]
+;movdqu xmm4, xmm2
+;movdqu xmm5, xmm3
 
 xor r14, r14
 xor r14, r15
@@ -88,13 +88,20 @@ jp .even
 .odd:
 	.odd_row:
 		.odd_column:
+			movdqu xmm2, [rdi]
+			add rdi, FOUR_PIXELS_OFFSET
+			movdqu xmm3, [rdi]
+			movdqu xmm4, xmm2
+			movdqu xmm5, xmm3
+			add rdi, FOUR_PIXELS_OFFSET
+
 			pand xmm2,xmm9;xmm2 = [0, 3, 0, 1] with mask [00,FF,00,FF]
 			pand xmm3,xmm9;xmm3 = [0, 7, 0, 5] with mask [00,FF,00,FF]
-			pshufd xmm3, xmm3, 10110001b ; xmm3 = [7, 0, 5, 0] should change this with shift 
+			pslldq xmm3, PIXEL_OFFSET
 			
 			pand xmm4,xmm14;xmm4 = [4, 0, 2, 0] filtro [FF,00,FF,00]
 			pand xmm5,xmm14;xmm5 = [8, 0, 6, 0] filtro [FF,00,FF,00]
-			pshufd xmm4, xmm4, 10110001b ; xmm4 = [0, 4, 0, 2] should change this with shift
+			psrldq xmm4, PIXEL_OFFSET
 
 			por xmm2, xmm3;xmm2 or xmm3 = xmm2
 			por xmm4, xmm5;xmm3 or xmm5 = xmm4 
@@ -112,17 +119,11 @@ jp .even
 			cmp rcx, 0
 			je .column_end
 
-			add rdi, FOUR_PIXELS_OFFSET
-			movdqu xmm2, [rdi]
-			add rdi, FOUR_PIXELS_OFFSET
-			movdqu xmm3, [rdi]
-			movdqu xmm4, xmm2
-			movdqu xmm5, xmm3
 			jmp .odd_column
 		.column_end:
 
 		;have to take care of 4 last pixels by hand 
-		add rdi, FOUR_PIXELS_OFFSET
+		;add rdi, FOUR_PIXELS_OFFSET
 		mov eax, [rdi]
 		mov [r8], eax
 		add rdi, PIXEL_OFFSET
@@ -141,15 +142,14 @@ jp .even
 		mov [r9], eax
 		add rdi, PIXEL_OFFSET
 
-
 		add r8, PIXEL_OFFSET
 		add r9, PIXEL_OFFSET
 
-		movdqu xmm2, [rdi]
-		add rdi, FOUR_PIXELS_OFFSET
-		movdqu xmm3, [rdi]
-		movdqu xmm4, xmm2
-		movdqu xmm5, xmm3
+		;movdqu xmm2, [rdi]
+		;add rdi, FOUR_PIXELS_OFFSET
+		;movdqu xmm3, [rdi]
+		;movdqu xmm4, xmm2
+		;movdqu xmm5, xmm3
 
 		sub rdx, 1;
 		cmp rdx, 0
@@ -171,13 +171,22 @@ jp .even
 .even:
 	.even_row:
 		.even_column:
+			movdqu xmm2, [rdi]
+			add rdi, FOUR_PIXELS_OFFSET
+			movdqu xmm3, [rdi]
+			movdqu xmm4, xmm2
+			movdqu xmm5, xmm3
+			add rdi, FOUR_PIXELS_OFFSET
+
+
+
 			pand xmm2,xmm9;xmm2 = [0, 3, 0, 1] filtro [00,FF,00,FF]
 			pand xmm3,xmm9;xmm3 = [0, 7, 0, 5] filtro [00,FF,00,FF]
-			pshufd xmm3, xmm3, 10110001b ; cambiar por shifteo
+			pslldq xmm3, PIXEL_OFFSET
 			
 			pand xmm4,xmm14;xmm4 = [4, 0, 2, 0] filtro [FF,00,FF,00]
 			pand xmm5,xmm14;xmm5 = [8, 0, 6, 0] filtro [FF,00,FF,00]
-			pshufd xmm4, xmm4, 10110001b ; cambiar por shifteo
+			psrldq xmm4, PIXEL_OFFSET
 
 			por xmm2, xmm3;xmm2 o xmm3 = xmm0
 			por xmm4, xmm5;xmm3 o xmm5 = xmm1
@@ -188,16 +197,9 @@ jp .even
 
 			movdqu [r8], xmm2 ; guarda 4 pixeles en el cuadrante 1 o 3
 			movdqu [r9], xmm4 ; guarda 4 pixeles en el cuadrante 2 o 4 
-
 			add r8, FOUR_PIXELS_OFFSET
 			add r9, FOUR_PIXELS_OFFSET
 
-			add rdi, FOUR_PIXELS_OFFSET
-			movdqu xmm2, [rdi]
-			add rdi, FOUR_PIXELS_OFFSET
-			movdqu xmm3, [rdi]
-			movdqu xmm4, xmm2
-			movdqu xmm5, xmm3
 			loop .even_column
 		sub rdx, 1;
 		cmp rdx, 0
