@@ -20,3 +20,10 @@ cmake_install.cmake
 perf/tp2
 perf/tp2_data
 perf/Makefile
+
+*.out
+*.gz
+*.log
+*.pdf
+*.toc
+*.aux
