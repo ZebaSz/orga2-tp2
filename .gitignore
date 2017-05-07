@@ -5,7 +5,25 @@ bin/
 
 tests/data/
 
+*.a
 *.o
 src/tp2
 src/tools/diff
 src/bmp/example
+
+.ipynb_checkpoints
+
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+
+perf/tp2
+perf/tp2_data
+perf/Makefile
+
+*.out
+*.gz
+*.log
+*.pdf
+*.toc
+*.aux
