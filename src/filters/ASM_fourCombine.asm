@@ -41,12 +41,6 @@ mov rax, CERO_FFS2_HIGH
 movq xmm0, rax
 paddq xmm14, xmm0
 
-;movdqu xmm2, [rdi]; [4,3,2,1] 
-;add rdi, FOUR_PIXELS_OFFSET
-;movdqu xmm3, [rdi]; [8,7,6,5]
-;movdqu xmm4, xmm2
-;movdqu xmm5, xmm3
-
 xor r14, r14
 xor r14, r15
 
@@ -123,7 +117,6 @@ jp .even
 		.column_end:
 
 		;have to take care of 4 last pixels by hand 
-		;add rdi, FOUR_PIXELS_OFFSET
 		mov eax, [rdi]
 		mov [r8], eax
 		add rdi, PIXEL_OFFSET
@@ -144,12 +137,6 @@ jp .even
 
 		add r8, PIXEL_OFFSET
 		add r9, PIXEL_OFFSET
-
-		;movdqu xmm2, [rdi]
-		;add rdi, FOUR_PIXELS_OFFSET
-		;movdqu xmm3, [rdi]
-		;movdqu xmm4, xmm2
-		;movdqu xmm5, xmm3
 
 		sub rdx, 1;
 		cmp rdx, 0
@@ -177,8 +164,6 @@ jp .even
 			movdqu xmm4, xmm2
 			movdqu xmm5, xmm3
 			add rdi, FOUR_PIXELS_OFFSET
-
-
 
 			pand xmm2,xmm9;xmm2 = [0, 3, 0, 1] filtro [00,FF,00,FF]
 			pand xmm3,xmm9;xmm3 = [0, 7, 0, 5] filtro [00,FF,00,FF]
