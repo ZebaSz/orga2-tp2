@@ -27,3 +27,5 @@ perf/Makefile
 *.pdf
 *.toc
 *.aux
+
+perf/*.csv
