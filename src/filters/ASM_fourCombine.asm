@@ -50,24 +50,34 @@ mov r15, rdx;h
 mov r8, rcx ; c1
 mov r9, rcx ; c1
 
-mov rax, rcx 
 shl r15, 2
 mov rcx, r15
 
 shr r14, 1; w/2
-.move_fila:
-	add rax, r14 ; ancho columna * alto / 2 * pixel
-	loop .move_fila
+
+push rcx
+push rdx
+mov rax, r14
+mul r15
+pop rdx
+pop rcx
+add rax, r8
 
 mov r10, rax; c3
 mov r11, rax; c3
 
 mov rcx, r14
 
-.move_columna:
-	add r9, PIXEL_OFFSET
-	add r11, PIXEL_OFFSET
-	loop .move_columna
+push rcx
+push rdx
+mov rax, r14
+mov ebx, PIXEL_OFFSET
+mul ebx
+pop rdx
+pop rcx
+add r9, rax
+add r11, rax
+
 
 shr rsi, 2 ; w/4
 mov rax, rsi ;
