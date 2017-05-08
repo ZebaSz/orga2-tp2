@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 2.8)
 project(orga2_tp2)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -O0 -ggdb -lm -std=c99")
@@ -31,7 +31,7 @@ if(CMAKE_ASM_NASM_COMPILER_LOADED)
             src/filters/ASM_fourCombine.asm
             src/filters/ASM_linearZoom.asm
             src/filters/ASM_maxCloser.asm)
-    set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -g -F DWARF")
+    set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -f elf64 -g -F DWARF")
 endif(CMAKE_ASM_NASM_COMPILER_LOADED)
 
 set(BMP_FILES
