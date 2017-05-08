@@ -97,121 +97,80 @@ ASM_convertYUVtoRGB_loop:
     psubd xmm4, xmm13 ; subtract from all components of fourth pixel
 
     ; FIRST PIXEL
-    movdqu xmm15, xmm1 ; get the first pixel
-    pmulld xmm15, xmm9 ; do R multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new R value
-    movd xmm5, eax
-    pslldq xmm5, 4
+    movdqu xmm14, xmm1 ; get the first pixel
+    pmulld xmm14, xmm9 ; do R multiplications
+    ; XMM14 = |Ry|Ru|Rv|0|
 
     movdqu xmm15, xmm1 ; get the first pixel
     pmulld xmm15, xmm10 ; do G multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new G value
-    movd xmm15, eax
-    paddd xmm5, xmm15
-    pslldq xmm5, 4
+    phaddd xmm15, xmm14 ; XMM15 = |Ry+u|Rv|Gy+u|Gv|
 
-    movdqu xmm15, xmm1 ; get the first pixel
-    pmulld xmm15, xmm11 ; do B multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new B value
-    movd xmm15, eax
-    paddd xmm5, xmm15
-    pslldq xmm5, 4
+    movdqu xmm14, xmm1 ; get the first pixel
+    pmulld xmm14, xmm11 ; do B multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |By+u|Bv|By+u|Bv|
+
+    phaddd xmm14, xmm15 ; XMM14 = |R|G|B|B|
+
+    movdqa xmm5, xmm14
 
     paddd xmm5, xmm12
     psrad xmm5, 8
 
     ; SECOND PIXEL
-    movdqu xmm15, xmm2 ; get the second pixel
-    pmulld xmm15, xmm9 ; do Y multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm6, eax
-    pslldq xmm6, 4
+    movdqu xmm14, xmm2 ; get the first pixel
+    pmulld xmm14, xmm9 ; do R multiplications
+    ; XMM14 = |Ry|Ru|Rv|0|
 
-    movdqu xmm15, xmm2 ; get the second pixel
-    pmulld xmm15, xmm10 ; do U multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new u value
-    movd xmm15, eax
-    paddd xmm6, xmm15
-    pslldq xmm6, 4
+    movdqu xmm15, xmm2 ; get the first pixel
+    pmulld xmm15, xmm10 ; do G multiplications
+    phaddd xmm15, xmm14 ; XMM15 = |Ry+u|Rv|Gy+u|Gv|
 
-    movdqu xmm15, xmm2 ; get the second pixel
-    pmulld xmm15, xmm11 ; do V multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new v value
-    movd xmm15, eax
-    paddd xmm6, xmm15
-    pslldq xmm6, 4
+    movdqu xmm14, xmm2 ; get the first pixel
+    pmulld xmm14, xmm11 ; do B multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |By+u|Bv|By+u|Bv|
+
+    phaddd xmm14, xmm15 ; XMM14 = |R|G|B|B|
+
+    movdqa xmm6, xmm14
 
     paddd xmm6, xmm12
     psrad xmm6, 8
 
     ; THIRD PIXEL
-    movdqu xmm15, xmm3 ; get the third pixel
-    pmulld xmm15, xmm9 ; do Y multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm7, eax
-    pslldq xmm7, 4
+    movdqu xmm14, xmm3 ; get the first pixel
+    pmulld xmm14, xmm9 ; do R multiplications
+    ; XMM14 = |Ry|Ru|Rv|0|
 
-    movdqu xmm15, xmm3 ; get the third pixel
-    pmulld xmm15, xmm10 ; do U multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new u value
-    movd xmm15, eax
-    paddd xmm7, xmm15
-    pslldq xmm7, 4
+    movdqu xmm15, xmm3 ; get the first pixel
+    pmulld xmm15, xmm10 ; do G multiplications
+    phaddd xmm15, xmm14 ; XMM15 = |Ry+u|Rv|Gy+u|Gv|
 
-    movdqu xmm15, xmm3 ; get the third pixel
-    pmulld xmm15, xmm11 ; do V multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new v value
-    movd xmm15, eax
-    paddd xmm7, xmm15
-    pslldq xmm7, 4
+    movdqu xmm14, xmm3 ; get the first pixel
+    pmulld xmm14, xmm11 ; do B multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |By+u|Bv|By+u|Bv|
+
+    phaddd xmm14, xmm15 ; XMM14 = |R|G|B|B|
+
+    movdqa xmm7, xmm14
 
     paddd xmm7, xmm12
     psrad xmm7, 8
 
     ; FOURTH PIXEL
-    movdqu xmm15, xmm4 ; get the fourth pixel
-    pmulld xmm15, xmm9 ; do Y multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm8, eax
-    pslldq xmm8, 4
+    movdqu xmm14, xmm4 ; get the first pixel
+    pmulld xmm14, xmm9 ; do R multiplications
+    ; XMM14 = |Ry|Ru|Rv|0|
 
-    movdqu xmm15, xmm4 ; get the fourth pixel
-    pmulld xmm15, xmm10 ; do U multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm15, eax
-    paddd xmm8, xmm15
-    pslldq xmm8, 4
+    movdqu xmm15, xmm4 ; get the first pixel
+    pmulld xmm15, xmm10 ; do G multiplications
+    phaddd xmm15, xmm14 ; XMM15 = |Ry+u|Rv|Gy+u|Gv|
 
-    movdqu xmm15, xmm4 ; get the fourth pixel
-    pmulld xmm15, xmm11 ; do V multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new v value
-    movd xmm15, eax
-    paddd xmm8, xmm15
-    pslldq xmm8, 4
+    movdqu xmm14, xmm4 ; get the first pixel
+    pmulld xmm14, xmm11 ; do B multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |By+u|Bv|By+u|Bv|
+
+    phaddd xmm14, xmm15 ; XMM14 = |R|G|B|B|
+    movdqa xmm8, xmm14
 
     paddd xmm8, xmm12
     psrad xmm8, 8
@@ -222,9 +181,8 @@ ASM_convertYUVtoRGB_loop:
     packusdw xmm8, xmm7 ; pack third and fourth pixel together
 
     packuswb xmm8, xmm6 ; repack all pixels
-    movdqu xmm0, xmm8
 
-    movdqu [rcx + r11 * pixel_size], xmm0 ; store 4 pixels
+    movdqu [rcx + r11 * pixel_size], xmm8 ; store 4 pixels
 
     add r11, 4
     cmp r10, r11 ; for index < pixel amount
@@ -289,142 +247,102 @@ ASM_convertRGBtoYUV_loop:
 
     pxor xmm14, xmm14
 
-    movdqu xmm15, xmm0
+    movdqa xmm15, xmm0
     punpckhbw xmm15, xmm14 ; prepare to unpack first two pixels
 
-    movdqu xmm1, xmm15
+    movdqa xmm1, xmm15
     punpckhwd xmm1, xmm14 ; unpack first pixel
-    movdqu xmm2, xmm15
+    movdqa xmm2, xmm15
     punpcklwd xmm2, xmm14 ; unpack second pixel
 
-    movdqu xmm15, xmm0
+    movdqa xmm15, xmm0
     punpcklbw xmm15, xmm14 ; prepare to unpack last two pixels
-    movdqu xmm3, xmm15
+    movdqa xmm3, xmm15
     punpckhbw xmm3, xmm14 ; unpack third pixel
-    movdqu xmm4, xmm15
+    movdqa xmm4, xmm15
     punpcklbw xmm4, xmm14 ; unpack fourth pixel
 
     ; CONVERSION
 
     ; FIRST PIXEL
-    movdqu xmm15, xmm1 ; get the first pixel
-    pmulld xmm15, xmm9 ; do Y multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm5, eax
-    pslldq xmm5, 4
+    movdqa xmm14, xmm1 ; get the first pixel
+    pmulld xmm14, xmm9 ; do Y multiplications
+    ; XMM14 = |Yr|Yg|Yb|0|
 
-    movdqu xmm15, xmm1 ; get the first pixel
+    movdqa xmm15, xmm1 ; get the first pixel
     pmulld xmm15, xmm10 ; do U multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new u value
-    movd xmm15, eax
-    paddd xmm5, xmm15
-    pslldq xmm5, 4
+    phaddd xmm15, xmm14 ; XMM15 = |Yr+b|Yg|Ur+b|Ug|
 
-    movdqu xmm15, xmm1 ; get the first pixel
-    pmulld xmm15, xmm11 ; do V multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new v value
-    movd xmm15, eax
-    paddd xmm5, xmm15
-    pslldq xmm5, 4
+    movdqa xmm14, xmm1 ; get the first pixel
+    pmulld xmm14, xmm11 ; do V multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |Vr+b|Vg|Vr+b|Vg|
+
+    phaddd xmm14, xmm15 ; XMM14 = |Y|U|V|V|
+
+    movdqa xmm5, xmm14
 
     paddd xmm5, xmm12
     psrad xmm5, 8
     paddd xmm5, xmm13
 
     ; SECOND PIXEL
-    movdqu xmm15, xmm2 ; get the second pixel
-    pmulld xmm15, xmm9 ; do Y multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm6, eax
-    pslldq xmm6, 4
+    movdqa xmm14, xmm2 ; get the second pixel
+    pmulld xmm14, xmm9 ; do Y multiplications
+    ; XMM14 = |Yr|Yg|Yb|0|
 
-    movdqu xmm15, xmm2 ; get the second pixel
+    movdqa xmm15, xmm2 ; get the second pixel
     pmulld xmm15, xmm10 ; do U multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new u value
-    movd xmm15, eax
-    paddd xmm6, xmm15
-    pslldq xmm6, 4
+    phaddd xmm15, xmm14 ; XMM15 = |Yr+b|Yg|Ur+b|Ug|
 
-    movdqu xmm15, xmm2 ; get the second pixel
-    pmulld xmm15, xmm11 ; do V multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new v value
-    movd xmm15, eax
-    paddd xmm6, xmm15
-    pslldq xmm6, 4
+    movdqu xmm14, xmm2 ; get the second pixel
+    pmulld xmm14, xmm11 ; do V multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |Vr+b|Vg|Vr+b|Vg|
+
+    phaddd xmm14, xmm15 ; XMM14 = |Y|U|V|V|
+
+    movdqa xmm6, xmm14
 
     paddd xmm6, xmm12
     psrad xmm6, 8
     paddd xmm6, xmm13
 
     ; THIRD PIXEL
-    movdqu xmm15, xmm3 ; get the third pixel
-    pmulld xmm15, xmm9 ; do Y multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm7, eax
-    pslldq xmm7, 4
+    movdqu xmm14, xmm3 ; get the third pixel
+    pmulld xmm14, xmm9 ; do Y multiplications
+    ; XMM14 = |Yr|Yg|Yb|0|
 
     movdqu xmm15, xmm3 ; get the third pixel
     pmulld xmm15, xmm10 ; do U multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new u value
-    movd xmm15, eax
-    paddd xmm7, xmm15
-    pslldq xmm7, 4
+    phaddd xmm15, xmm14 ; XMM15 = |Yr+b|Yg|Ur+b|Ug|
 
-    movdqu xmm15, xmm3 ; get the third pixel
-    pmulld xmm15, xmm11 ; do V multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new v value
-    movd xmm15, eax
-    paddd xmm7, xmm15
-    pslldq xmm7, 4
+    movdqu xmm14, xmm3 ; get the third pixel
+    pmulld xmm14, xmm11 ; do V multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |Vr+b|Vg|Vr+b|Vg|
+
+    phaddd xmm14, xmm15 ; XMM14 = |Y|U|V|V|
+
+    movdqa xmm7, xmm14
 
     paddd xmm7, xmm12
     psrad xmm7, 8
     paddd xmm7, xmm13
 
     ; FOURTH PIXEL
-    movdqu xmm15, xmm4 ; get the fourth pixel
-    pmulld xmm15, xmm9 ; do Y multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm8, eax
-    pslldq xmm8, 4
+    movdqu xmm14, xmm4 ; get the fourth pixel
+    pmulld xmm14, xmm9 ; do Y multiplications
+    ; XMM14 = |Yr|Yg|Yb|0|
 
     movdqu xmm15, xmm4 ; get the fourth pixel
     pmulld xmm15, xmm10 ; do U multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new y value
-    movd xmm15, eax
-    paddd xmm8, xmm15
-    pslldq xmm8, 4
+    phaddd xmm15, xmm14 ; XMM15 = |Yr+b|Yg|Ur+b|Ug|
 
-    movdqu xmm15, xmm4 ; get the fourth pixel
-    pmulld xmm15, xmm11 ; do V multiplications
-    phaddd xmm15, xmm15
-    phaddd xmm15, xmm15 ; add components
-    movd eax, xmm15 ; get dword with new v value
-    movd xmm15, eax
-    paddd xmm8, xmm15
-    pslldq xmm8, 4
+    movdqu xmm14, xmm4 ; get the fourth pixel
+    pmulld xmm14, xmm11 ; do V multiplications
+    phaddd xmm14, xmm14 ; XMM14 = |Vr+b|Vg|Vr+b|Vg|
+
+    phaddd xmm14, xmm15 ; XMM14 = |Y|U|V|V|
+
+    movdqa xmm8, xmm14
 
     paddd xmm8, xmm12
     psrad xmm8, 8
@@ -436,9 +354,8 @@ ASM_convertRGBtoYUV_loop:
     packusdw xmm8, xmm7 ; pack third and fourth pixel together
 
     packuswb xmm8, xmm6 ; repack all pixels
-    movdqu xmm0, xmm8
 
-    movdqu [rcx + r11 * pixel_size], xmm0 ; store 4 pixels
+    movdqu [rcx + r11 * pixel_size], xmm8 ; store 4 pixels
 
     add r11, 4
     cmp r10, r11 ; for index < pixel amount
