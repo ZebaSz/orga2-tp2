@@ -1,27 +1,142 @@
-\section{Convertir YUV a RGB y RGB a YUV}
+\section{Convertir entre RGB e YUV}
+
+Los primeros filtros se tratan de conversores entre los espacios de colores RGB e YUV. Los mismos toman los valores de cada pixel y aplican transformaciones matriciales, tomando cada pixel individual como una matriz de sus componentes.
+
+Esta transformación normalmente implica decimales, pero la misma está simplificada para funcionar con enteros entre 0 y 255 (que son los valores posibles de cada componente de un pixel).
+
+Para la conversión RGB a YUV se aplican la siguiente transformación:
+
+\begin{center}
+
+	$
+	\begin{bmatrix*}[l]
+	Y = sature(((66 * R + 129 * G + 25 * B + 128) >> 8) + 16) \\
+	U = sature(((-38 * R - 74 * G + 112 * B + 128) >> 8) + 128) \\
+	V = sature(((112 * R - 94 * G - 18 * B + 128) >> 8) + 128)
+	\end{bmatrix*}
+	$
+
+\end{center}
+
+donde $sature$ representa una saturación sin signo, es decir, los valores fuera del rango [0,255] son acotados a los extremos del mismo.
+
+Para la transformación inversa se utiliza la siguiente transformación:
+
+\begin{center}
+
+	$
+	\begin{bmatrix*}[l]
+	R = sature((298 * (Y - 16) + 409 * (V - 128) + 128) >> 8) \\
+	G = sature((298 * (Y - 16) - 100 * (U - 128) - 208 * (V - 128) + 128) >> 8) \\
+	B = sature((298 * (Y - 16) + 516 * (U - 128) + 128) >> 8)
+	\end{bmatrix*}
+	$
+
+\end{center}
+
+Cabe destacar que si bien los valores son correctos, los visores de imágenes siguen renderizando los colores como si correspondiesen a RGB, por lo que se genera el efecto visual que se muestra a continuación:
+
+
+\begin{figure}[H]
+	\centering
+	$\vcenter{\hbox{\includegraphics[scale=1]{img/convert_RGB.jpg}}}$
+	$\vcenter{\hbox{\LARGE$\xrightleftharpoons[\text{YUVtoRGB}]{\text{RGBtoYUV}}$}}$
+	$\vcenter{\hbox{\includegraphics[scale=1]{img/convert_YUV.jpg}}}$
+\end{figure}
+
 
 \subsection{Implementación}
-\subsubsection*{Explicación general de la solución}
-\subsubsection*{Detalles de la implementación}
+
+La solución implica recorrer la imagen completa aplicando la transformación a cada pixel de manera individual.
+
+La implementación en C es relativamente trivial: se aplica la transformación correspondiente a cada componente de manera individual. En el caso de la transformación YUV a RGB existen algunos valores que podemos reutilizar, pero los demás cálculos se realizan como se indica en el problema.
+
+Para la implementación en ASM definimos un par de constantes. La idea es que cada una represente una fila de la matriz de transformación. De esta manera, podemos calcular los 3 componentes fuente de cada componente destino en simultaneo:
+
+
+\begin{center}
+
+\xmm{1} \xmmDoubleWordSmall{R}{G}{B}{0} \\
+
+\xmm{14} $\leftarrow$ \xmm{1} \\
+\xmm{15} $\leftarrow$ \xmm{1} \\
+
+\xmm{9} \xmmDoubleWordSmall{66}{129}{25}{0} \\
+\xmm{10} \xmmDoubleWordSmall{-38}{-74}{112}{0} \\
+\xmm{11} \xmmDoubleWordSmall{112}{-94}{-18}{0} \\
+
+\texttt{PMULLD} \xmm{14}, \xmm{9} \hfill
+
+\xmm{14} \xmmDoubleWordSmall{$Y'_R$}{$Y'_G$}{$Y'_B$}{0} \\
+
+
+\texttt{PMULLD} \xmm{15}, \xmm{10} \hfill
+
+\xmm{15} \xmmDoubleWordSmall{$U'_R$}{$U'_G$}{$U'_B$}{0} \\
+
+
+\xmm{1} \xmmDoubleWordSmall{R}{G}{B}{0} \\
+
+\texttt{PMULLD} \xmm{1}, \xmm{11} \hfill
+
+\xmm{1} \xmmDoubleWordSmall{$V'_R$}{$V'_G$}{$V'_B$}{0} \\
+
+\end{center}
+
+Estos valores parciales luego son sumados en paralelo
+
+\begin{center}
+
+\texttt{PHADDD} \xmm{15}, \xmm{14} \hfill
+
+\xmm{15} \xmmDoubleWordSmall{$Y'_{R+G}$}{$Y'_B$}{$U'_{R+G}$}{$U'_B$} \\
+
+
+\texttt{PHADDD} \xmm{1}, \xmm{1} \hfill
+
+\xmm{1} \xmmDoubleWordSmall{$V'_{R+G}$}{$V'_B$}{$V'_{R+G}$}{$V'_B$} \\
+
+\texttt{PHADDD} \xmm{1}, \xmm{15} \hfill
+
+\xmm{1} \xmmDoubleWordSmall{$Y'$}{$U'$}{$V'$}{$V'$} \\
+
+\end{center}
+
+Como se puede ver, al sumar se genera un valor duplicado al final. El mismo no la correción del filtro (ya que no estamos trabajando con el componente alfa), y se genera porque las imagenes tienen 3 componentes.
+
+Por último, estos componentes se denotan con $'$ porqe los mismos no son los valores finales: debemos aplicar 2 sumas y un shift a todos los componentes para finalizar la conversión. Para las sumas utilizamos nuevamente constantes precargadas en un registro XMM.
+
+Ya que contamos con registros de 128 bits y cada pixel mide 32 bits de ancho (RGBA), podemos cargar 4 pixeles de la memoria por iteración. Los mismos son empaquetados y desempaquetados, y la lógica se encuentra cuadruplicada para procesar todos. Esto se hace para reducir el impacto de los accesos a memoria y los saltos condicionales.
+
+Un detalle importante que aplica a este filtro es la independencia entre todos los pixeles, y la independencia de los mismos con respecto a su posición. Este detalle nos permite recorrer la imagen no como una matriz de pixeles sino como una lista continua de tamaño $w \times h$.
 
 
 \subsection{Análisis preeliminar}
 \subsubsection*{Comparación de rendimiento de ASM vs C}
-\subsubsection*{Comparar para distintos tamaños, relaciones entre implementaciones}
 
-\subsection{Hipótesis de trabajo}
-\subsubsection*{Conjunto de ideas de experimentos}
-\subsubsection*{Afirmaciones que buscan probar verdaderas}
-\subsubsection*{Deben ser concisas y claras}
+Para comparar el rendimiento de los algoritmos implementados, utilizamos los macros provistos por la cátedra para leer los valores del timestamp counter. Los valores de tiempo están expresados en ticks.
 
-\subsection{Diseño experimental}
-\subsubsection*{Explicación de como y que van a medir}
-\subsubsection*{Explicación del conjunto de datos de entrada}
-\subsubsection*{Detalles de la plataforma y la configuración de la misma}
+A modo de reducir el ruido, repetimos cada medición varias veces y tomamos el menor valor de cada medición al graficar (ya que cualquier valor mayor representa ruido introducido por el scheduler y otros factores).
 
-\subsection{Resultados y Análisis}
-\subsubsection*{Resultados obtenidos, gráficos y tablas}
-\subsubsection*{Explicación e interpretación de los resultados obtenidos}
+Como ambos filtros son muy similares, los podemos comparar lado a lado:
 
-\subsection{Conclusiones}
-\subsubsection*{Relación entre las hipótesis de trabajo y resultados}
+\begin{center}
+\includegraphics[scale=0.5]{img/rgb2yuv_CvsASM.png}
+\includegraphics[scale=0.5]{img/yuv2rgb_CvsASM.png}
+\end{center}
+
+Por un lado, se puede notar una diferencia enorme en la performance del algoritmo escrito en C contra el escrito en ASM.
+
+Por otro lado, se puede ver que la escala del conversor YUV a RGB toma menores valores para el algoritmo en C. Esto de debe a ciertas operaciones que como mencionamos se repiten, y por ende podemos pre-calcular y reutilizar valores intermedios.
+
+
+\subsection{Experimentación}
+
+Si bien la primera comparación es interesante, no estabamos seguros si se trataba pobre uso de recusos por parte del compilador. Por esto, decidimos comparar contra el mayor valor de optimización de GCC (\texttt{-O3}):
+
+\begin{center} 
+\includegraphics[scale=0.5]{img/rgb2yuv_CvsASMvsO3.png}
+\includegraphics[scale=0.5]{img/yuv2rgb_CvsASMvsO3.png}
+\end{center}
+
+Al compilar con optimizaciones, la brecha de performance baja drásticamente. Sospechamos que esto se debe a un uso más exhaustivo de los registros en lugar de acceder constantemente a memrio. Sin embargo, en ciertos casos se puede ver que el algoritmo escrito con instrucciones SIMD sigue siendo más óptimo (hasta casi 60\% del tiempo, 2090676 en ASM vs 3377772 en C con \texttt{-O3}). Si bien la diferencia es visiblemente menor, y nuestras mediciones contaron con un poco de ruido, la diferencia porcentual es visible y relevante.
