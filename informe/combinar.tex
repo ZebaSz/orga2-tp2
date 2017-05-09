@@ -1,5 +1,4 @@
 \section{Combinar}
-\subsection{Introducción al problema}
 Este filtro consiste en cambiar la distribución de píxeles de una imagen tal que queden ordenados en cuatro cuadrantes diferentes. Se obtendrá mediante la aplicación de este filtro cuatro imágenes distintas de menor tamaño a la original, pero en donde los píxeles de la original se encuentran aun presentes en la imagen resultante. Es decir : 
 \begin{center}
 $\forall$ $pixel,$ $cantidadPixeles(pixel, imagenOriginal) == cantidadPixeles(pixel,imagenResultante)$ 
@@ -87,17 +86,16 @@ También podemos ver en la figura 2 cual es el impacto de nuestro filtro en una 
 \paragraph{Solución en codigo C}
 La solución que fue planteada en c consiste en recorrer la matriz asociada a la imagen de entrada una sola vez píxel por píxel. Cada uno de estos píxeles posee una coordenada y por medio de esta se calcula la coordenada en la matriz asociada a la imagen de salida. 
 
-\lstinputlisting{../src/filters/C_fourCombine.c}
 
 \paragraph{Solucion en ASM}
 En cuanto a la implementación en código assembler se tuvo que pensar una solución totalmente diferente ya que al tener que hacerlo con registros de 128 bits nuestra solución de agarrar los píxeles uno por uno y calcular su lugar correspondiente no seria posible. Se tomaron las siguientes decisiones de modelado Decisiones de modelado:
 \begin{itemize}
-\item Decidir con cuanta información a la vez íbamos a trabajar , se llego a la conclusion que lo mejor seria trabajar con 8 pixeles a la vez. Esta decision se tomo puesto que eligiendo los 8 pixeles del lugar correcto podíamos llegar a armar 8 pixeles que iban a ser puestos en la imagen de salida. Esto nos deberia dar un ahorro en la cantidad de veces que vamos a pegarle a memoria.
-\item Decidir entre la posibilidad de agarrar 16 pixeles que este en la misma fila o que esten la misma columna. Nos parecio lo mas facil de implementar y lo mas efectivo a la hora de usar la cache era que tomaramos 8 pixeles contiguos. Se vera mas adelante en un experimento la diferencia entre ambos
-\item Ya que ibamos a tomar de a 8 pixeles contiguos pero el enunciado del trabajo practico solo aseguraba que la imagen a lo ancho iba a ser multiplo de 4 , teniamos que hacer algo con respecto a los casos donde la imagen no era multiplo de 8. En este caso tratamos de emular un poco la practica que realiza muchas veces el compilador de intel donde este separa el codigo en casos especiales para poder ahorrarse de preguntar en el medio del código . Por ende en nuestro codigo ASM solo preguntamos una vez si el ancho es multiplo de 4 o de 8 y dependiendo de eso el código se disfurca en dos
+\item Decidir con cuanta información a la vez íbamos a trabajar , se llego a la conclusión que lo mejor seria trabajar con 8 píxeles a la vez. Esta decisión se tomo puesto que eligiendo los 8 píxeles del lugar correcto podíamos llegar a armar 8 píxeles que iban a ser puestos en la imagen de salida. Esto nos debería dar un ahorro en la cantidad de veces que vamos a pegarle a memoria.
+\item Decidir entre la posibilidad de agarrar 16 píxeles que este en la misma fila o que esten la misma columna. Nos pareció lo mas facil de implementar y lo mas efectivo a la hora de usar la cache era que tomáramos 8 pixeles contiguos. Se vera mas adelante en un experimento la diferencia entre ambos
+\item Ya que íbamos a tomar de a 8 pixeles contiguos pero el enunciado del trabajo practico solo aseguraba que la imagen a lo ancho iba a ser múltiplo de 4 , teníamos que hacer algo con respecto a los casos donde la imagen no era múltiplo de 8. En este caso tratamos de emular un poco la practica que realiza muchas veces el compilador de intel donde este separa el código en casos especiales para poder ahorrarse de preguntar en el medio del código . Por ende en nuestro código ASM solo preguntamos una vez si el ancho es múltiplo de 4 o de 8 y dependiendo de eso el código se disfurca en dos
 \end{itemize}
 
-Ahora hablemos un poco mas de la iteración dentro del un ciclo de  nuestro código ASM , podemos separar lo que hace dentro de una columna de lo que hace al cambiar de fila. Dentro de una columna nuestro objetivo es agarrar 8 pixeles llamense $Pi$ con $1\leq i\leq 8$ y trabajarlos de forma tal que queden listos para ser pegados en la memoria de la imagen destino. El siguiente grafico nos mostrara como ocurre la transformación de los 8 pixeles desde que son extraidos desde la imagen fuente hasta que estan listos para ser puestos en la imagen destino : 
+Ahora hablemos un poco mas de la iteración dentro del un ciclo de nuestro código ASM , podemos separar lo que hace dentro de una columna de lo que hace al cambiar de fila. Dentro de una columna nuestro objetivo es agarrar 8 pixeles llamense $Pi$ con $1\leq i\leq 8$ y trabajarlos de forma tal que queden listos para ser pegados en la memoria de la imagen destino. El siguiente grafico nos mostrara como ocurre la transformación de los 8 pixeles desde que son extraidos desde la imagen fuente hasta que estan listos para ser puestos en la imagen destino : 
 
 \begin{tikzpicture}
 \matrix [matrix of nodes,row sep=,row sep=0mm,
@@ -266,7 +264,7 @@ Snippet del codigo :
 		mov r11, rax
 \end{lstlisting}
 
-Lo único que cambia de esta explicación con respecto a cuando el ancho no es multiplico de 8 es en este punto donde tenemos que cambiar de fila, ya que nos quedaron 4 píxeles sin procesar y como seria demasiado trabajoso quedarselos para poder trabajarlos en otra iteración posterior, lo mejor que nos ocurrió fue trabajarlos manualmente e insertarlos en el lugar donde les corresponde. Luego de esto se sigue con el paso recién explicado.
+Lo único que cambia de esta explicación con respecto a cuando el ancho no es multiplico de 8 es en este punto donde tenemos que cambiar de fila, ya que nos quedaron 4 píxeles sin procesar y como seria demasiado trabajoso holdearlos para poder trabajarlos en otra iteración posterior, lo mejor que nos ocurrió fue trabajarlos manualmente e insertarlos en el lugar donde les corresponde. Luego de esto se sigue con el paso recién explicado.
 
 
 \subsection{Análisis preliminar}
@@ -275,18 +273,31 @@ Lo único que cambia de esta explicación con respecto a cuando el ancho no es m
 
 \subsection{Hipótesis de trabajo}
 \subsubsection*{Conjunto de ideas de experimentos}
-Ideas sobre los experimentos a realizar 
+Una de las primeras ideas a la hora de experimentar con nuestra implementación de ASM es poder correrla en contra de la de implementación que se realizo en C , teniendo en cuenta que en el caso de este filtro juega mas el echo de guardar en memoria los datos que de procesarlos.
+
+También tratamos de llevar a cabo en este conjunto de experimentación la idea de Loop unrolling , con alguna pequeña modificación. Si vamos a lo que se entiende como Loop unrolling y lo aplicamos al algoritmo de ASM lo que lograríamos seria leer de a 16 píxeles a lo largo a la vez en de a 8 píxeles logrando así una reducción en los saltos del loop de columna. Pero esta implementación nos llevaría a tener que abrir mas los casos en los cuales anteriormente tratábamos ahora tendríamos imágenes que deberían ser congruentes a 0 modulo 16 para poder ir por el camino del unrolling pero caso contrario es decir ser congruente 4, 8 , 12 deberían tratarse en otra parte del programa y así solo logrando un incremento en la performance para 0.25 de los casos. Para poder solventar este pequeño numero de casos donde el unrolling podría ser efectivo se decidió procesar 16 píxeles a la vez pero distribuidos en dos filas , de esta manera solo habría que tener en cuenta que las filas sean múltiplos de 2 es decir pares para poder aplicar esta mejora al algoritmo.
+
+Otra idea que había surgido para probar en un experimento fue la de usar registros mas grandes (AVX) para poder lograr así una reducción a la hora de mezclar los elementos, se había pensado que teniendo muchos mas píxeles juntos iba a resultar mas fácil poder ordenarlos para su posterior puesta en en memoria. El problema con este experimento fue que encontramos que las instrucciones AVX (que funcionan en 256 bits) lo único que hacen es replicar comportamientos en la parte baja y la alta del registro es decir los trata como dos registros de 128 bits que solo logran comportamientos de este tipo de registro. Desistimos de hacer este experimento por no encontrar las instrucciones necesarias para poder realizar un código mas performante que el propuesto como solución. 
 \subsubsection*{Afirmaciones que buscan probar verdaderas}
-\subsubsection*{Deben ser concisas y claras}
+Buscamos mediante distintos sistemas de medidas mostrar que desenrollar el loop aumenta la performance de nuestro algoritmo ya que el sistema de predicción debería predecir menos saltos.
 
 \subsection{Diseño experimental}
 \subsubsection*{Explicación de como y que van a medir}
-\subsubsection*{Explicación del conjunto de datos de entrada}
-\subsubsection*{Detalles de la plataforma y la configuración de la misma}
+Queremos ver bien de cerca que es lo que pasa con nuestras dos implementaciones porque si tomamos las medidas en una escala muy chica vamos a perder información sobre que lo que esta pasando. 
 
+También nos gustaría saber cual es el tiempo que se demoran ambos algoritmos en desarrollar un ciclo. Sabemos que la diferencia esta en que ambos resuelven diferente cantidad de  píxeles a la vez, por ende el tiempo que demoren en resolver un ciclo va a estar dividido por la cantidad de elementos que trabaja a la vez. Vamos a poner también en la misma linea el tiempo de un ciclo del algoritmo de c que solo procesa un píxel a la vez.
+
+Un experimento interesante que debería estar incluido en el tp sería poder medir que porcentaje de un ciclo del algoritmo presentado como respuesta se utiliza cargando datos, que porcentaje en procesarlos y que porcentaje en cargarlos nuevamente a memoria, tenemos la impresión que la gran mayoría del tiempo se la pasa cargando y poniendo cosas en memoria por ende si quisiéramos mejorar aun mas nuestro algoritmo podríamos solamente trabajar sobre el porcentaje de procesamiento de los datos. Estaríamos en presencia de un cuello de botella representado por la memoria.
+
+El roll del cache en imágenes grandes aquí vamos a probar cual es la diferencia entre la implementación presentada como respuesta al trabajo practico y la implementación del unrolling. Aunque anteriormente vimos que en ejemplos chicos la implementación del unrolling era mejor, en el caso de imágenes obscenamente grandes (mayores a la capacidad del cache) esto no ocurre en imágenes grandes.
+\subsubsection*{Explicación del conjunto de datos de entrada}
+En el único momento que vamos a utilizar datos por fuera de la cátedra va a ser al momento de querer ver el funcionamiento de la cache en nuestro algoritmo, en este caso utilizamos una imagen que excede la cache de nuestra CPU , la imagen pesa 200mb y por obvios motivos no va a ser adjuntada junto al tp.
 \subsection{Resultados y Análisis}
 \subsubsection*{Resultados obtenidos, gráficos y tablas}
+
+
 \subsubsection*{Explicación e interpretación de los resultados obtenidos}
+
 
 \subsection{Conclusiones}
 \subsubsection*{Relación entre las hipótesis de trabajo y resultados}
