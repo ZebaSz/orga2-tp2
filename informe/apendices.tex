@@ -1,0 +1,18 @@
+\section{Apéndices}
+ 	\subsection{Apéndice I: recolección de datos}
+
+ 	Para recolectar datos, tratamos de armar un criterio consistente y que genere el menor ruido posible. Para esto hicimos lo siguiente:
+
+ 	\begin{itemize}
+ 		\item Las mediciones de tiempo se realizan antes y después de la llamada al algoritmo del filtro (obviando el tiempo de carga y liberado de memoria de las imágenes).
+
+ 		\item Las mediciones de tiempo se realizan utilizando el comando \texttt{RDTSC} a través del macro de C provisto por la cátedra.
+
+ 		\item Se utilizaron los siguientes tamaños de imagen: 64x64, 128x128, 192x192, 256x256, 320x320, 384x384, 448x448 y 512x512. Se utilizó una sola proporción para las imágenes (1:1) para evitar introducir posibles discrepancias. 
+
+ 		\item Cada medición se repitió 100 veces, conservando únicamente el valor menor, ya que consideramos al mismo el más representativo y con menos ruido de otros procesos en la computadora.
+
+ 		\item Todas las mediciones se realizaron en un mismo equipo del laboratorio Turing, para evitar diferencias de hardware.
+ 	\end{itemize}
+
+ 	Los datos obtenidos fueron almacenados en formato CSV, y luego analizados y graficados utilizando pandas y matplotlib.
