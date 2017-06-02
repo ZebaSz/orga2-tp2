@@ -121,22 +121,9 @@ A modo de reducir el ruido, repetimos cada medición varias veces y tomamos el m
 Como ambos filtros son muy similares, los podemos comparar lado a lado:
 
 \begin{center}
-\includegraphics[scale=0.5]{img/rgb2yuv_CvsASM.png}
-\includegraphics[scale=0.5]{img/yuv2rgb_CvsASM.png}
+	\includegraphics[scale=0.5]{img/conversores_CvsASMvsO3.png}
 \end{center}
 
-Por un lado, se puede notar una diferencia enorme en la performance del algoritmo escrito en C contra el escrito en ASM.
+Por un lado, se puede notar una diferencia enorme en la performance del algoritmo escrito en C contra el escrito en ASM. Al compilar con optimizaciones, la brecha de performance baja drásticamente. Sospechamos que esto se debe a un uso más exhaustivo de los registros en lugar de acceder constantemente a memoria. Sin embargo, se puede ver que el algoritmo escrito con instrucciones SIMD sigue siendo más óptimo (hasta casi 60\% del tiempo, 2090676 en ASM vs 3377772 en C con \texttt{-O3}). Si bien la diferencia es visiblemente menor, y nuestras mediciones contaron con un poco de ruido, la diferencia porcentual es visible y relevante.
 
-Por otro lado, se puede ver que la escala del conversor YUV a RGB toma menores valores para el algoritmo en C. Esto de debe a ciertas operaciones que como mencionamos se repiten, y por ende podemos pre-calcular y reutilizar valores intermedios.
-
-
-\subsection{Experimentación}
-
-Si bien la primera comparación es interesante, no estabamos seguros si se trataba pobre uso de recusos por parte del compilador. Por esto, decidimos comparar contra el mayor valor de optimización de GCC (\texttt{-O3}):
-
-\begin{center} 
-\includegraphics[scale=0.5]{img/rgb2yuv_CvsASMvsO3.png}
-\includegraphics[scale=0.5]{img/yuv2rgb_CvsASMvsO3.png}
-\end{center}
-
-Al compilar con optimizaciones, la brecha de performance baja drásticamente. Sospechamos que esto se debe a un uso más exhaustivo de los registros en lugar de acceder constantemente a memrio. Sin embargo, en ciertos casos se puede ver que el algoritmo escrito con instrucciones SIMD sigue siendo más óptimo (hasta casi 60\% del tiempo, 2090676 en ASM vs 3377772 en C con \texttt{-O3}). Si bien la diferencia es visiblemente menor, y nuestras mediciones contaron con un poco de ruido, la diferencia porcentual es visible y relevante.
+Por otro lado, se puede ver que en O0 el conversor YUV a RGB performa mejor que su contraparte RGB a YUV (con una diferencia de más de 10\%). Esto posiblemente se deba a ciertas operaciones que como mencionamos se repiten, y por ende podemos pre-calcular y reutilizar valores intermedios.

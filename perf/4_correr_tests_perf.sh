@@ -2,11 +2,6 @@
 
 source param.sh
 
-img0=${IMAGENES[0]}
-img0=${img0%%.*}
-img1=${IMAGENES[1]}
-img1=${img1%%.*}
-
 #$1 : Programa Ejecutable
 #$2 : Filtro e Implementacion Ejecutar
 #$3 : Archivos de Entrada
@@ -16,7 +11,6 @@ img1=${img1%%.*}
 function run_test {
     echo -e "dale con... $VERDE $4 $DEFAULT"
     $1 $2 $3 $ALUMNOSDIR/$4 $5
-    ret=0;return;
 }
 
 rm rgb2yuv.csv
@@ -30,48 +24,42 @@ echo "Algoritmo,Tamaño,Ticks" > linearZoom.csv
 rm maxCloser.csv
 echo "Algoritmo,Tamaño,Ticks" > maxCloser.csv
 
-for imp in c asm; do
-
+for imp in ${IMPS[*]}; do
 # convertYUV
   for s in ${SIZES[*]}; do
-    run_test "$TP2DATA" "$imp rgb2yuv" "$TESTINDIR/$img0.$s.bmp" "$imp.$img0.$s.yuv.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
-    run_test "$TP2DATA" "$imp rgb2yuv" "$TESTINDIR/$img1.$s.bmp" "$imp.$img1.$s.yuv.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
+    for f in ${IMAGENES[*]}; do
+      run_test "$TP2DATA" "$imp rgb2yuv" "$TESTINDIR/$f.$s.bmp" "$imp.$f.$s.yuv.bmp" ""
+    done
   done
 
-# convertYUV
+# convertRGB
   for s in ${SIZES[*]}; do
-    run_test "$TP2DATA" "$imp yuv2rgb" "$ALUMNOSDIR/$imp.$img0.$s.yuv.bmp" "$imp.$img0.$s.rgb.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
-    run_test "$TP2DATA" "$imp yuv2rgb" "$ALUMNOSDIR/$imp.$img1.$s.yuv.bmp" "$imp.$img1.$s.rgb.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
+    for f in ${IMAGENES[*]}; do
+      run_test "$TP2DATA" "$imp yuv2rgb" "$ALUMNOSDIR/$imp.$f.$s.yuv.bmp" "$imp.$f.$s.rgb.bmp" ""
+    done
   done
 
 # fourCombine
   for s in ${SIZES[*]}; do
-    run_test "$TP2DATA" "$imp fourCombine" "$TESTINDIR/$img0.$s.bmp" "$imp.$img0.$s.four.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
-    run_test "$TP2DATA" "$imp fourCombine" "$TESTINDIR/$img1.$s.bmp" "$imp.$img1.$s.four.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
+    for f in ${IMAGENES[*]}; do
+      run_test "$TP2DATA" "$imp fourCombine" "$TESTINDIR/$f.$s.bmp" "$imp.$f.$s.four.bmp" ""
+    done
   done
 
 # linearZoom
   for s in ${SIZES[*]}; do
-    run_test "$TP2DATA" "$imp linearZoom" "$TESTINDIR/$img0.$s.bmp" "$imp.$img0.$s.zoom.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
-    run_test "$TP2DATA" "$imp linearZoom" "$TESTINDIR/$img1.$s.bmp" "$imp.$img1.$s.zoom.bmp" ""
-    if [ $ret -ne 0 ]; then exit -1; fi
+    for f in ${IMAGENES[*]}; do
+      run_test "$TP2DATA" "$imp linearZoom" "$TESTINDIR/$f.$s.bmp" "$imp.$f.$s.zoom.bmp" ""
+    done
   done
   
 # maxCloser
-  for v in 0 0.313 0.5 0.713 1; do
-  for s in ${SIZES[*]}; do
-    run_test "$TP2DATA" "$imp maxCloser" "$TESTINDIR/$img0.$s.bmp" "$imp.$img0.$s.$v.max.bmp" "$v"
-    if [ $ret -ne 0 ]; then exit -1; fi
-    run_test "$TP2DATA" "$imp maxCloser" "$TESTINDIR/$img1.$s.bmp" "$imp.$img1.$s.$v.max.bmp" "$v"
-    if [ $ret -ne 0 ]; then exit -1; fi
-  done
+  for v in ${VS[*]}; do
+    for s in ${SIZES[*]}; do
+      for f in ${IMAGENES[*]}; do
+        run_test "$TP2DATA" "$imp maxCloser" "$TESTINDIR/$f.$s.bmp" "$imp.$f.$s.$v.max.bmp" "$v"
+      done
+    done
   done
 
 done
