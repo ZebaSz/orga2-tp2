@@ -72,19 +72,12 @@ Ya conseguido el máximo, ahora tenemos que realizar la combinación lineal con 
 \subsection{Análisis preeliminar}
 \subsubsection*{Comparación de rendimiento de ASM vs C}
 Como en los otros filtros, corrimos una serie de tests para las mismas imágenes en diferentes tamaños. Primero vamos a comparar la implementación de C contra la de ASM.
-\begin{center} 
-\includegraphics[scale=0.5]{img/maxCloser_CvsASM.png}
+
+\begin{center}
+	\includegraphics[scale=0.5]{img/maxCloser_CvsASMvsO3.png}
 \end{center}
 
-Podemos ver claramente como el filtro implementado en ASM corre más rápido que en C, de hecho, al incrementar el tamaño de la imagen la diferencia es aún más notable. Esto es un comportamiento esperable ya que en C estamos yendo a buscar el pixel a memoria por cada pixel del kernel, en cambio en ASM con las instrucciones SIMD cada 7 pixeles lo pedimos 2 veces. Además, en ASM aprovechamos y hacemos las cuentas para el pixel destino en paralelo. 
-
-A la hora de compilar el código en C, se pueden aplicar optimizaciones, el compilador interpreta el código y trata de mejorar nuestro codigo potencialmente. Una de estas es aplicando el flag O3 a la hora de compilar. Comparemos el mismo set de test anterior pero ahora con el flag O3 activado.
-
-\begin{center} 
-\includegraphics[scale=0.5]{img/maxCloser_CvsASMvsO3.png}
-\end{center}
-
-Si bien hay una amplia mejora en la implementación de C sin el flag O3 contra la que tiene el flag activado, no llega a mejorar la versión de ASM. 
+Podemos ver claramente como el filtro implementado en ASM corre más rápido que en C, de hecho, al incrementar el tamaño de la imagen la diferencia es aún más notable. Si bien hay una amplia mejora al compilar con optimizaciones O3, no llega a mejorar la versión de ASM. Esto es un comportamiento esperable ya que en C estamos yendo a buscar el pixel a memoria por cada pixel del kernel, en cambio en ASM con las instrucciones SIMD cada 7 pixeles lo pedimos 2 veces. Además, en ASM aprovechamos y hacemos las cuentas para el pixel destino en paralelo.
 
 \subsection{Experimantación}
 Queremos ver cómo impacta en ambas implementaciones si agrandamos el tamaño de kernel. Vamos a correr los mismos tests que antes, pero ahora en vez que del kernel sea 7x7 será de 11x11.
@@ -92,9 +85,9 @@ Queremos ver cómo impacta en ambas implementaciones si agrandamos el tamaño de
 Nuestra hipótesis, es que esta medida va a afectar con más contundencia a la implementación de C, si bien en ASM va a tardar más, en relación al kernel mas chico, no le va afectar tanto. Esto es debido a que, en C trae cada pixel del kernel uno por vez, y como son casi 2.5 veces más, la cantidad de píxeles en el kerenel, esperamos una performance peor en este orden. Pero en ASM aprovechando la paralelización de datos, levantamos 11 píxeles con 3 llamadas a memoria nada más.
 
 \begin{center} 
-\includegraphics[scale=0.5]{img/maxCloser_KERNEL.png}
-\includegraphics[scale=0.5]{img/maxCloser_KERNEL_ASM.png}
-\includegraphics[scale=0.5]{img/maxCloser_KERNEL_C.png}
+	\includegraphics[scale=0.5]{img/maxCloser_KERNEL.png}
+	\includegraphics[scale=0.5]{img/maxCloser_KERNEL_ASM.png}
+	\includegraphics[scale=0.5]{img/maxCloser_KERNEL_C.png}
 \end{center}
 
 Si observamos los gráficos, podemos ver como en C con el kernel de 11x11 tarda casi 2,5 veces más, como la relación de diferencia de pixeles en los kernels, y para ASM hay nada mas una diferencia de 1,2 y 1,4 para instancias más grandes. Como habíamos predicho en la hipótesis, este cambio en el tamaño del kernel, afectó bastante más a la implementación de C que a la de ASM.
