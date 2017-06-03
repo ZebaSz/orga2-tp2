@@ -1,5 +1,20 @@
 \section{Maximo cercano}
 
+%[DONE]Descripción:
+%	Fijensé si no queda mejor utilizar enumerates para describir los pasos a realizar para aplicar el filtro.[DONE]
+%[DONE]Implementación:
+%	Necesitaría una re-escritura. Es difícil de seguir a veces, no es muy clara.[DONE]
+%	Al principio describís lo que parecería ser el filtro en C. La división entre la explicación de cada implementación no queda muy clara.[DONE]
+%	Dicen que utilizan 4 píxeles en un registro, y 4 en el otro. No describen si son contiguos o si es la fila inferior.[DONE]
+%Análisis preliminar
+%	No tiene mucho sentido tener dos gráficos, uno con O3 y otro sin O3. [DONE]
+%	Sería interesante tener como resultado cuán mejor en tiempo una implementación contra la otra.
+%Experimentación
+%	Lo que quieren ver es cuán diferente va a ser temporalmente cada una de las implementaciones, y eso no está claro en los gráficos.
+%		No hablan sobre alguna característica observable en el gráfico en relación al tamaño de la entrada, sólo comentan cuántas veces más rápido es.
+%		No está claro con ver en los gráficos que es 2.5, 1.4, o 1.2 veces más rápido, deberían cambiarlos por otros donde la comparación sea evidente. Lo que comentan debe estar respaldado y ser fácil de corroborar a simple vista.
+%	Falta experimentación.
+
 Este es un filtro tal que cada pixel de la imagen original se edita de la siguiente manera:
 
 \begin{enumerate}
@@ -36,52 +51,71 @@ Donde $src$ es el píxel original, $max$ es el píxel generado, y $val$ es un n�
 \subsection{Implementación}
 
 Para la implementación de este filtro, recorremos la imagen original, iterando sobre sus filas y sus columnas, como hay píxeles que no tenemos un kernel de 7x7 alrededor, estos los pintamos de blanco, pero si podemos, iteramos sobre el kernel y nos vamos fijando cuáles son las componentes máximas y cuando recorrimos todo el kernel, para cada componente hacemos esta cuenta: \\ Componente Destino $\leftarrow$ Componente Original * (1 - VAL) + Componente Máxima * VAL. (Donde VAL es el parámetro que nos pasan en la función).
+ 
+La implementación en C se trató de hacerla lo más simple posible. Iteramos las filas y las columnas, y en cada paso preguntamos si el píxel se encuentra en el margen de 3 píxeles, si es así, lo pintamos de blanco, y si no, nos generamos un píxel con cada componente inicializada en el mínimo valor(0) y recorremos el kernel y usamos este píxel que acabamos de generar para usarlo de máximo actual, entonces vamos modificando cada componente cuando encontramos un valor mayor al encontrado, una vez iterado el kernel realizamos la combinación lineal sobre cada componente y guardamos el píxel en la imagen destino.
+ 
+En cambio, en la implementación del filtro en lenguaje ensamblador, esta se ve complejizada ya que podemos aprovechar de las ventajas que nos brinda el modelo SIMD. En particular, los registros XMM son de 16 bytes, que los podemos utilizar para procesar 4 píxeles en paralelo. Para esta implementación, vamos a aprovechar estos registros para buscar el máximo sobre el kernel y hacer la combinación lineal sobre cada componente en paralelo.
+ 
+En este caso también vamos a iterar sobre las filas y las columnas, primero recorremos las filas y vamos a diferenciar 2 casos, el caso en que toda la fila se encuentra en el margen que se pinta de blanco y el que no.
+ 
+Si es una fila blanca, vamos a intentar guardar la mayor cantidad de píxeles contiguos posible, como ya vimos que en los registros XMM nos caben 4, nos generamos un registro tal que los 4 píxeles sean blancos y guardarlos en memoria a la vez, al ser imágenes con ancho múltiplo de 4, podemos aplicar esto sobre toda la fila, entonces iteramos sobre las columnas pero vamos aumentando en 4 el índice de la columna. Con esto logramos en las primeras filas y las últimas una reducción al iterar las columnas.
+ 
+Ahora sí es una fila que no va a pertenecer en su completitud al margen, vamos a tener que calcular el máximo de cada color en el kernel y después hacer la combinación lineal. En la iteración del kernel, en diferencia a C, podemos guardarnos 4 píxeles tal que puedan ser los máximos, vamos a hacer uso de la instrucción PMAXUB, que compara byte a byte entre los registros y guarda el máximo en el registro destino. Gracias a esta instrucción podemos ir comparando estos 4 posibles máximos contra 4 píxeles contiguos del kernel (notar que la comparación es byte a byte, así que va a comparar las componentes), e ir manteniendo los máximos. Como en el kernel tenemos nada más 7 píxeles contiguos, vamos a aplicar este método 2 veces por fila, repitiendo un píxel de la fila en cada aplicación total esto no va a afectar el resultado.
 
-Al implementar este filtro en lenguaje ensamblador, podemos aprovechar de las ventajas que nos brinda el modelo SIMD. En particular, los registros XMM son de 16 bytes, que los podemos utilizar para procesar 4 píxeles en paralelo. Para esta implementación, vamos a aprovechar estos registros para buscar el máximo sobre el kernel y hacer la combinación lineal sobre cada componente en paralelo.
+\begin{minipage}{\linewidth}
+	\begin{center} 
+		\includegraphics[]{img/max/filaKernel.pdf}
+		\captionof{figure}{Píxeles contiguos de una fila del kernel, las llaves indican que píxeles se toman en las 2 aplicaciones por fila}
+	\end{center}
+\end{minipage}
 
-Como dijimos recorremos las columnas y filas, primero nos fijamos si es una fila que tenemos que pintar de blanco, en caso afirmativo, sabemos que toda esa fila va a hacer blanca, entonces podemos aprovechar los registros XMM para guardar en memoria múltiples pixeles y como nos entran 4, podemos generarnos un registro XMM que contenga 4 píxeles blancos y guardarlos en memoria en la imagen destino a la vez. 
+\begin{minipage}{\linewidth}
+	\begin{center}
+		\xmm{1} \xmmDoubleWordSmall{$P_1$}{$P_2$}{$P_3$}{$P_4$}
 
-Ahora sí es un píxel que debemos calcularlo, tenemos que iterar sobre el kernel y buscar el máximo de cada color. Lo que podemos hacer para aprovechar SIMD, es cargar 4 píxeles en un registro y otros 4 en otro, ahora si aplicamos la instrucción PMAXUB, que compara byte a byte entre los registros y guarda el máximo de los dos en el destino. Entonces lo que ganamos con esto es que en el registro destino nos quedó 4 píxeles que cada tiene el máximo de cada componente entre el pixel que estaban en la misma posición de los 2 registros. 
+		\xmm{2} \xmmDoubleWordSmall{$P_5$}{$P_6$}{$P_7$}{$P_8$}
 
-\begin{center}
-\xmm{1} \xmmDoubleWordSmall{$P_1$}{$P_2$}{$P_3$}{$P_4$}
+		\texttt{PMAXUB} \xmm{1}, \xmm{2} \hfill
 
-\xmm{2} \xmmDoubleWordSmall{$P_5$}{$P_6$}{$P_7$}{$P_8$}
+		\xmm{1} \xmmDoubleWordSmall{\tiny$MAX(P_1,P_5)$}{\tiny$MAX(P_2,P_6)$}{\tiny$MAX(P_3,P_7)$}{\tiny$MAX(P_4,P_8)$}
 
-\texttt{PMAXUB} \xmm{1}, \xmm{2} \hfill
+		$MAX(PM,P)$ = \xmmDoubleWordSmall{\tiny$MAX(PM^r,P^r)$}{\tiny$MAX(PM^g,P^g)$}{\tiny$MAX(PM^b,P^b)$}{\tiny$MAX(PM^a,P^a)$}
+		\captionof{figure}{Como queda el registro después de aplicar la instrucción}
+	\end{center}
+\end{minipage}
 
-\xmm{1} \xmmDoubleWordSmall{\tiny$MAX(P_1,P_5)$}{\tiny$MAX(P_2,P_6)$}{\tiny$MAX(P_3,P_7)$}{\tiny$MAX(P_4,P_8)$}
-\end{center}
 
-$MAX(PM,P)$ = \xmmDoubleWordSmall{\tiny$MAX(PM^r,P^r)$}{\tiny$MAX(PM^g,P^g)$}{\tiny$MAX(PM^b,P^b)$}{\tiny$MAX(PM^a,P^a)$}
+Una vez realizado esto sobre cada fila, vamos a tener en el registro los cuatro posibles píxeles máximos, ahora debemos compararlos entre sí para conseguir el píxel que contenga el máximo de cada componente. Para esto podemos seguir usando PMAXUB, duplicamos el registro y shifteamos 8 bytes a la derecha uno de ellos, para que nos quede desplazado 2 píxeles y podamos comparar el primer par de píxeles del registro contra el segundo par. Todavía nos queda por comparar 2 píxeles así que repetimos este procedimiento pero esta vez desplazamos un solo píxel, una vez realizado esto nos va a quedar en la parte menos significativa del registro el píxel que estábamos buscando.
 
-Usando esta metodología podemos mantener un XMM que contenga los píxeles máximos y lo comparamos contra los del kernel, actualizando este registro. Pero como cada fila del kernel tiene 7 píxeles contiguos, hacemos esta técnica dos veces, pero estaríamos comparando 8 pixeles, así que repetimos un píxel en cada paso asi comparamos todos los píxeles. Hacemos esto para cada fila del kernel y nos termina quedando un registro con 4 posibles máximos, luego debemos compararlos entre sí. Para ello copiamos el registro donde tenemos los posibles máximos, shifteamos a la derecha uno de ellos, 8 bytes shifteamos para que nos quede desplazado 2 pixeles. Y volvemos a comparar, ahora nos quedan solamente 2 y de vuelta desplazamos los pixeles pero ahora solamente 4 bytes, y comparamos de vuelta, quedandonos el píxel máximo.
+\begin{minipage}{\linewidth}
+	\begin{center}
+		\xmm{1} \xmmDoubleWordSmall{$M_1$}{$M_2$}{$M_3$}{$M_4$} \\
+		\xmm{2} $\leftarrow$ \xmm{1} \\
+		\texttt{PSRLDQ} \xmm{2}, \texttt{8} \hfill \\
+		\xmm{2} \xmmDoubleWordSmall{0}{0}{$M_1$}{$M_2$} \\
 
-\begin{center}
-\xmm{1} \xmmDoubleWordSmall{$M_1$}{$M_2$}{$M_3$}{$M_4$} \\
-\xmm{2} $\leftarrow$ \xmm{1} \\
-\texttt{PSRLDQ} \xmm{2}, \texttt{8} \hfill \\
-\xmm{2} \xmmDoubleWordSmall{0}{0}{$M_1$}{$M_2$} \\
+		\texttt{PMAXUB} \xmm{1}, \xmm{2} \hfill
 
-\texttt{PMAXUB} \xmm{1}, \xmm{2} \hfill
+		\xmm{1} \xmmDoubleWordSmall{$M_1$}{$M_2$}{\tiny$MAX(M_1,M_3)$}{\tiny$MAX(M_2,M_4)$} \\
 
-\xmm{1} \xmmDoubleWordSmall{$M_1$}{$M_2$}{\tiny$MAX(M_1,M_3)$}{\tiny$MAX(M_2,M_4)$} \\
+		\xmm{2} $\leftarrow$ \xmm{1} \\
+		\texttt{PSRLDQ} \xmm{2}, \texttt{4} \hfill \\
+		\xmm{2} \xmmDoubleWordSmall{0}{$M_1$}{$M_2$}{\tiny$MAX(M_1,M_3)$} \\
 
-\xmm{2} $\leftarrow$ \xmm{1} \\
-\texttt{PSRLDQ} \xmm{2}, \texttt{4} \hfill \\
-\xmm{2} \xmmDoubleWordSmall{0}{$M_1$}{$M_2$}{\tiny$MAX(M_1,M_3)$} \\
+		\texttt{PMAXUB} \xmm{1}, \xmm{2} \hfill \\
 
-\texttt{PMAXUB} \xmm{1}, \xmm{2} \hfill \\
+		\xmm{1} \vspace{0.1cm}
+		\begin{tabular}{|C{1cm}|C{1cm}|C{1cm}|C{3.8cm}|}\hline
+		X & X & X & $MAX(M_1,M_2,M_3,M_4)$ \\ \hline
+		\end{tabular}
+		\vspace{0.1cm}
 
-\xmm{1} \vspace{0.1cm}
-\begin{tabular}{|C{1cm}|C{1cm}|C{1cm}|C{3.8cm}|}\hline
-X & X & X & $MAX(M_1,M_2,M_3,M_4)$ \\ \hline
-\end{tabular}
-\vspace{0.1cm}
+		\captionof{figure}{Shifts sobre los registros para conseguir el máximo}
+	\end{center}
+\end{minipage}
 
-\end{center}
 
-Ya conseguido el máximo, ahora tenemos que realizar la combinación lineal con el píxel original, el nuevo píxel que generamos y el parámetro. Lo que queremos es hacer la cuenta en paralelo, para eso, podemos usar instrucciones SIMD para multiplicar las componentes de los píxeles en paralelo por el parámetro, que es un float, entonces convertimos a float cada componente quedándonos todas las componentes en un registro XMM, y para multiplicarlas por el parámetro tenemos que hacer un registro XMM que lo contenga 4 veces y aplicamos MULPS, quedando de resultado la multiplicación por cada componente contra el parámetro cada una en floats. Luego hacemos lo mismo con el píxel original, y sumamos estos dos resultados. Ahora nos queda guardar este resultado en la imagen destino, pero antes, debemos convertir los floats a integers.
+Ya conseguido el máximo, ahora tenemos que realizar la combinación lineal con el píxel original, el nuevo píxel que generamos y el parámetro. Lo que queremos es hacer la cuenta para cada componente paralelo, para eso, podemos usar instrucciones SIMD para multiplicar las componentes de los píxeles en paralelo por el parámetro, que es un float, entonces convertimos a float cada componente quedándonos todas las componentes en un registro XMM, y para multiplicarlas por el parámetro tenemos que hacer un registro XMM que lo contenga 4 veces y aplicamos MULPS, quedando de resultado la multiplicación por cada componente contra el parámetro cada una en floats. Luego hacemos lo mismo con el píxel original, y sumamos estos dos resultados. Ahora nos queda guardar este resultado en la imagen destino, pero antes, debemos convertir los floats a integers. Ya guardado en memoria, podes seguir repitiendo el paso para los otros píxeles.
 
 \subsection{Análisis preeliminar}
 \subsubsection*{Comparación de rendimiento de ASM vs C}
