@@ -1,0 +1,30 @@
+\section{Apéndices}
+ 	\subsection{Apéndice I: recolección de datos}
+
+ 	Para recolectar datos, tratamos de armar un criterio consistente y que genere el menor ruido posible. Para esto hicimos lo siguiente:
+
+ 	\begin{itemize}
+ 		\item Las mediciones de tiempo se realizan antes y después de la llamada al algoritmo del filtro (obviando el tiempo de carga y liberado de memoria de las imágenes).
+
+ 		\item Las mediciones de tiempo se realizan utilizando el comando \texttt{RDTSC} a través del macro de C provisto por la cátedra.
+
+ 		\item Para las mediciones de control se utilizaron los siguientes tamaños de imagen: 64x64, 128x128, 192x192, 256x256, 320x320, 384x384, 448x448 y 512x512. Se utilizó una sola proporción para las imágenes (1:1) para evitar introducir posibles discrepancias.
+
+ 		\item Para las mediciones de control se utilizaron las imágenes provistas por la cátedra: \texttt{lena.bmp} y \texttt{colores.bmp}. Las mismas cuentan un una distribución relativamente heterogenea de colores y por ende podrían considerarse un “caso promedio”.
+
+ 		\item Cada medición se repitió 100 veces, conservando únicamente el valor menor, ya que consideramos al mismo el más representativo y con menos ruido de otros procesos en la computadora.
+
+ 		\item Todas las mediciones se realizaron en equipos del laboratorio Turing, para evitar diferencias de hardware.
+ 	\end{itemize}
+
+ 	Los datos obtenidos fueron almacenados en formato CSV, y luego analizados y graficados utilizando pandas y matplotlib.
+
+ 	\subsection{Apendice II: experimentación con distintas entradas}
+
+ 	A la hora de experimentar, decidimos probar el impacto de ciertas imágenes en los algoritmos. En el apéndice I se mencionan los casos considerados como “control”.
+
+ 	Realizamos experimentos con las siguientes imágenes:
+
+ 	\begin{itemize}
+ 		\item \texttt{blanco.bmp}: una imagen enteramente blanca (es decir, donde todos los pixeles son \texttt{(255,255,255)}). La idea era medir el impacto de las funciones de saturación tanto en C (programado como \texttt{if-else}) y en ASM (utilizando empaquetado con saturación sin signo).
+ 	\end{itemize}

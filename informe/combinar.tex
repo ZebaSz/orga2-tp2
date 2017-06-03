@@ -70,15 +70,12 @@ Se puede ver en el ejemplo de la figura 1 como es la distribución que va tenien
 También podemos ver en la figura 2 cual es el impacto de nuestro filtro en una imagen real, podremos notar aquí lo parecidas que son imágenes resultantes en cada uno de los cuadrantes, a nuestro ojo es casi imperceptible la diferencia.
 
 \begin{figure}[H]
-\begin{subfigure}[b]{0.50\textwidth} 
-\includegraphics[scale=0.4]{img/fourCombine_before.jpg}
-\end{subfigure}
-{\LARGE$\xrightarrow{T}$}
-\begin{subfigure}[b]{0.50\textwidth} 
-\includegraphics[scale=0.4]{img/fourCombine_after.jpg}
-\end{subfigure}
+	\centering
+	$\vcenter{\hbox{\includegraphics[scale=0.38]{img/fourCombine_before.jpg}}}$
+	$\vcenter{\hbox{\LARGE$\xrightarrow{\text{T}}$}}$
+	$\vcenter{\hbox{\includegraphics[scale=0.38]{img/fourCombine_after.jpg}}}$
 
-\caption{Imagen real antes y luego de la aplicación del filtro}
+	\caption{Imagen real antes y luego de la aplicación del filtro}
 \end{figure}
 
 \subsection{Implementación}
@@ -271,9 +268,8 @@ Lo único que cambia de esta explicación con respecto a cuando el ancho no es m
 \subsubsection*{Comparar para distintos tamaños, relaciones entre implementaciones}
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{img/fourCombine_CvsASM.png}
+\includegraphics[scale=0.5]{img/fourCombine_CvsASMvsO3.png}
 \caption{Comparación llana de las implementaciones en C contra la implementación en ASM}
-\label{sec:ticksciclo}
 \end{figure}
 \subsubsection*{Comparación de rendimiento de ASM vs C}
 Luego de sacar manualmente un poco del ruido podemos ver una clara diferencia entre la implementación de C y la de ASM. Dato curioso que podemos agregar entre la diferencia de O0 y O3 es que al momento de compilar con gcc ( gracias a la herramienta \url{https://godbolt.org/} ) se puede apreciar como una linea de código se vuelve ASM dependiendo el flag. 
@@ -318,9 +314,9 @@ En el único momento que vamos a utilizar datos por fuera de la cátedra va a se
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{img/fourCombine_UnrollvsNormal_log.png}
-\caption{Misma comparación pero aplicado un logaritmo}
-\label{sec:unroolvsnormal_log}
+\includegraphics[scale=0.5]{img/fourCombine_UnrollvsNormal_asmOnly.png}
+\caption{Comparación exclusiva de las implementaciones en ASM}
+\label{sec:unroolvsnormal_asmOnly}
 \end{figure}
 
 \begin{figure}[H]

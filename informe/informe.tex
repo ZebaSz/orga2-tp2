@@ -2,32 +2,21 @@
 \usepackage[paper=a4paper, left=1.5cm, right=1.5cm, bottom=1.5cm, top=3.5cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
-\usepackage[]{caratula}
 \usepackage[pdfencoding=auto, colorlinks=true, linkcolor=blue]{hyperref}
+\usepackage{caratula}
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{matrix}
 \usepackage{graphicx}
 \usepackage{subcaption}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage{float}
 \usepackage{listings}
-\usepackage{hyperref}
 \definecolor{commentgreen}{RGB}{2,112,10}
 \definecolor{eminence}{RGB}{108,48,130}
 \definecolor{weborange}{RGB}{255,165,0}
 \definecolor{frenchplum}{RGB}{129,20,83}
-\newcommand\complejidad{\textbf{Complejidad}}
-\newcommand\justifcomp{\textbf{Justificación}}
-\newcommand\OdeLinea[1]{\Comment*[r]{$O(#1)$}}
-\newcommand\OdeBloque[1]{\Comment*[f]{$O(#1)$}}
-
-\newcommand{\TituloDis}[1]{
-  \vspace*{1ex}\par\noindent\textbf{\large #1}\par
-}
-
-\newcommand{\algoritmo}[3]{\hangindent=\parindent#1 (#2) \ifx#3\empty\else$\rightarrow$ res: #3\fi}
-
 
 \newcommand{\mm}[1]{\texttt{MM$_{#1}$}\ }
 \newcommand{\xmm}[1]{\texttt{XMM$_{#1}$}\ }
@@ -115,9 +104,10 @@
 \submateria{Primer Cuatrimestre de 2017}
 \fecha{\today}
 \titulo{Trabajo Práctico 2}
+\grupo{InsiSto gEnio zen acaba}
 
 \integrante{Bonggio, Enzo}{074/15}{ebonggio@dc.uba.ar}
-\integrante{?, ?}{?}{?}
+\integrante{Szperling, Sebastián Ariel}{763/15}{sszperling@dc.uba.ar}
 \integrante{Tarrío, Ignacio}{363/15}{itarrio@dc.uba.ar}
 
 \maketitle
@@ -126,11 +116,21 @@
 \pagebreak
 
 \input{YUVconverter}
+%\pagebreak
 
 \input{combinar}
+\pagebreak
 
 \input{zoom}
+\pagebreak
 
 \input{max}
+\pagebreak
+
+\input{conclusiones}
+\pagebreak
+
+\input{apendices}
+\pagebreak
 
 \end{document}
