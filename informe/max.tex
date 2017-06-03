@@ -1,6 +1,20 @@
 \section{Maximo cercano}
 
-Este es un filtro en el que para cada pixel de la imagen original, se genera un pixel nuevo buscando cual es el máximo valor de cada componente en los píxeles de alrededor, y con este nuevo pixel hacemos una combinación lineal con el original, y un parámetro que nos dan y lo ponemos en la imagen destino en la misma posición que el original. La búsqueda de las componentes máximas, se hace sobre un kernel de 7x7 píxeles centrado en el pixel que estamos interesados en cambiar.
+Este es un filtro tal que cada pixel de la imagen original se edita de la siguiente manera:
+
+\begin{enumerate}
+	\item Obtenemos los píxeles de alrededor, que se encuentren a una distancia menor a 3 píxeles.
+	\item Se calcula el máximo valor para cada componente entre estos píxeles obtenidos.
+	\item Se genera un nuevo píxel con estas 3 valores encontrados.
+	\item El píxel final se calcula mediante una combinación lineal entre el píxel original y el píxel que contiene las componentes máximas.
+\end{enumerate}
+
+El conjunto de píxeles en donde se busca el máximo valor de cada componente, se lo conoce como kernel y en este caso es de 7x7 píxeles.\\
+La combinación lineal entre los píxeles se hace de la siguiente manera:
+\begin{center}
+$src * (1 - val) + max * (val)$
+\end{center}
+Donde $src$ es el píxel original, $max$ es el píxel generado, y $val$ es un número flotante entre 0 y 1, este mismo es un parámetro del filtro.
 
 \begin{table}[h]
 \centering
@@ -15,7 +29,7 @@ Este es un filtro en el que para cada pixel de la imagen original, se genera un 
  & \cellcolor[HTML]{FAFE8E}$P_{60}$ & \cellcolor[HTML]{FAFE8E}$P_{61}$  & \cellcolor[HTML]{FAFE8E}$P_{62}$  & \cellcolor[HTML]{FAFE8E}$P_{63}$  & \cellcolor[HTML]{FAFE8E}$P_{64}$  & \cellcolor[HTML]{FAFE8E}$P_{65}$ & \cellcolor[HTML]{FAFE8E}$P_{66}$ &  \\ \hline
  & \multicolumn{1}{l|}{}      & \multicolumn{1}{l|}{}      & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}      &
 \end{tabular}
-\caption{En rojo el pixel que estamos editando y en amarillo los píxeles que estan dentro del kernel}
+\caption{Kernel, en rojo el pixel que estamos editando y en amarillo los píxeles que forman parte del kernel}
 \end{table}
 
 
