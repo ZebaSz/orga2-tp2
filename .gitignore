@@ -29,3 +29,5 @@ perf/Makefile
 *.aux
 
 perf/*.csv
+
+.DS_Store
