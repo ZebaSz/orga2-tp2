@@ -1,3 +1,21 @@
+% RGB <-> YUV
+% Implementación
+% No queda claro por qué eligen calcular de a un sólo pixel.
+% No aclaran el tipo de desempaquetado que utilizan, o cómo dejan el registro (XMM1) como está al comienzo. Al final explican que esta operación la repiten 4 veces, pero no aclaran igualmente por qué decidieron desempaquetar a dw.
+% Hubiera quedado más claro si ponían los ejemplos de los registros que ejemplifican las máscaras justo debajo del texto que las nombra.
+% No cuentan de qué algoritmo están contando la implementación, si de RGB a YUV o al revés
+% En la explicación del valor repetido, escriben "El mismo no la correción del filtro" a qué se refieren?
+% Está muy bien que hayan ilustrado los registros.
+% Análisis preliminar
+% Intenten ser lo más precisos posible con el detalle de la experimentación.
+% En qué plataforma se corrió? 
+% Dónde pusieron los mecanismos de medición? Al hacer una llamada al filtro? Al comenzar a ejecutar el tp2? Cuántas veces lo corrieron (exactamente)?
+% No identificaron cuál algoritmo es cuál en los gráficos
+% Experimentación
+% La comparación con diferentes niveles de optimización en C tengo entendido que es parte del análisis preliminar.
+% Son dos experimentos simples (cambiar un par de instrucciones) o uno complejo, que involucre más cambio de código.
+% No identificaron cuál algoritmo es cuál en los gráficos
+
 \section{Convertir entre RGB e YUV}
 
 Los primeros filtros se tratan de conversores entre los espacios de colores RGB e YUV. Los mismos toman los valores de cada pixel y aplican transformaciones matriciales, tomando cada pixel individual como una matriz de sus componentes.
@@ -124,8 +142,7 @@ Ya que contamos con registros de 128 bits y cada pixel mide 32 bits de ancho (RG
 Un detalle importante que aplica a este filtro es la independencia entre todos los pixeles, y la independencia de los mismos con respecto a su posición. Este detalle nos permite recorrer la imagen no como una matriz de pixeles sino como una lista continua de tamaño $w \times h$.
 
 
-\subsection{Análisis preeliminar}
-\subsubsection*{Comparación de rendimiento de ASM vs C}
+\subsection{Análisis preliminar}
 
 Para realizar un análisis preliminar del rendimiento de los algoritmos, debimos medir los tiempos de ejecución de los mismos. Por claridad, unificamos el criterio utilizados para las mediciones a lo largo de todo el trabajo práctico. Los detalles de dicho critero se encuentran en el apéndice correspondiente.
 

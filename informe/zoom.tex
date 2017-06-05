@@ -1,3 +1,10 @@
+% Implementación:
+% Falta desarrollo.
+% Análisis preliminar
+% No se explica cómo se hicieron.
+% Si la idea es analizar el rendimiento de las implementaciones, para presentar la diferencia en rendimiento, es tal vez mejor mostrar sólo un gráfico de barras. En este caso, no hablan de por ejemplo, la literalidad del tiempo de ejecución o de alguna cuestión en particular en relación al crecimiento de la entrada, por lo que tal vez sería mejor cambiarlo.
+% Falta experimentación.
+
 \section{Zoom}
 
 El filtro LinearZoom consiste en interpolar linealmente los pixeles de la imagen, duplicando su ancho y su alto, es decir aumentando su tamaño efectivo en 4.
@@ -5,14 +12,14 @@ El filtro LinearZoom consiste en interpolar linealmente los pixeles de la imagen
 La interpolación lineal de los pixeles consiste en calcular los promedios de cada componente entre los pixeles adyacentes al nuevo pixel interpolado. La misma se puede representar con la siguente matriz:
 
 \begin{table}[H]
-\centering
+  \centering
   \begin{tabular}{ | c | c | }
     \hline
     A & B \\ \hline
     C & D \\
     \hline
   \end{tabular}
-{\LARGE$\xrightarrow{LinearZoom}$}
+  {\LARGE$\xrightarrow{LinearZoom}$}
   \begin{tabular}{ | c | c | c | c |}
     \hline
     A & (A+B)/2 & B & $\cdots$ \\ \hline
@@ -33,30 +40,26 @@ La implementación de este algoritmo requirió un enfoque distinto al que tomamo
 
 En la implementación con SIMD, podemos aprovechar las operaciones vectoriales para operar no solo sobre las múltiples componentes a la ves, sino también sobre más de un pixel (como son sumas de hasta 4 bytes, solo requerimos tamaño word por componente).
 
-
 \begin{center}
+  \xmm{3} \xmmQuadWord{A}{B}
 
-\xmm{3} \xmmQuadWord{A}{B} \\
+  \xmm{4} \xmmQuadWord{C}{D}
 
-\xmm{4} \xmmQuadWord{C}{D} \\
+  \texttt{PADDW} \xmm{3}, \xmm{4} \hfill
 
-\texttt{PADDW} \xmm{3}, \xmm{4} \hfill
+  \xmm{3} \xmmQuadWord{A+C}{B+D}
 
-\xmm{3} \xmmQuadWord{A+C}{B+D} \\
+  \texttt{PSRLW} \xmm{3}, 1 \hfill
 
-\texttt{PSRLW} \xmm{3}, 1 \hfill
-
-\xmm{3} \xmmQuadWord{(A+C)/2}{(B+D)/2} \\
-
+  \xmm{3} \xmmQuadWord{(A+C)/2}{(B+D)/2}
 \end{center}
 
-\subsection{Análisis preeliminar}
-\subsubsection*{Comparación de rendimiento de ASM vs C}
+\subsection{Análisis preliminar}
 
 Dado que la interpolación lineal es un procesamiento muy conocido de imágenes, nos esperabamos que fuese uno de los filtros más beneficiados por la vectorización de los cálculos.
 
 \begin{center}
-\includegraphics[scale=0.5]{img/linearZoom_CvsASMvsO3.png}
+  \includegraphics[scale=0.5]{img/linearZoom_CvsASMvsO3.png}
 \end{center}
 
 Efectivamente, nuestros análisis dieron que incluso con las optimizaciones de GCC, la vectorización de la interpolación aumenta el rendimiento de manera dramática, ejecutando el filtro siempre en menos del 50\% del tiempo.
