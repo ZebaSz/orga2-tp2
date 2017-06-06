@@ -1,20 +1,19 @@
 % RGB <-> YUV
 % Implementación
-% No queda claro por qué eligen calcular de a un sólo pixel.
-% No aclaran el tipo de desempaquetado que utilizan, o cómo dejan el registro (XMM1) como está al comienzo. Al final explican que esta operación la repiten 4 veces, pero no aclaran igualmente por qué decidieron desempaquetar a dw.
-% Hubiera quedado más claro si ponían los ejemplos de los registros que ejemplifican las máscaras justo debajo del texto que las nombra.
-% No cuentan de qué algoritmo están contando la implementación, si de RGB a YUV o al revés
-% En la explicación del valor repetido, escriben "El mismo no la correción del filtro" a qué se refieren?
-% Está muy bien que hayan ilustrado los registros.
+% [DONE] No queda claro por qué eligen calcular de a un sólo pixel.
+% [DONE] No aclaran el tipo de desempaquetado que utilizan, o cómo dejan el registro (XMM1) como está al comienzo. Al final explican que esta operación la repiten 4 veces, pero no aclaran igualmente por qué decidieron desempaquetar a dw.
+% [TODO] Hubiera quedado más claro si ponían los ejemplos de los registros que ejemplifican las máscaras justo debajo del texto que las nombra.
+% [DONE] No cuentan de qué algoritmo están contando la implementación, si de RGB a YUV o al revés
+% [DONE] En la explicación del valor repetido, escriben "El mismo no la correción del filtro" a qué se refieren?
 % Análisis preliminar
-% Intenten ser lo más precisos posible con el detalle de la experimentación.
-% En qué plataforma se corrió? 
-% Dónde pusieron los mecanismos de medición? Al hacer una llamada al filtro? Al comenzar a ejecutar el tp2? Cuántas veces lo corrieron (exactamente)?
-% No identificaron cuál algoritmo es cuál en los gráficos
+% [DONE] Intenten ser lo más precisos posible con el detalle de la experimentación.
+% [DONE] En qué plataforma se corrió? 
+% [DONE] Dónde pusieron los mecanismos de medición? Al hacer una llamada al filtro? Al comenzar a ejecutar el tp2? Cuántas veces lo corrieron (exactamente)?
+% [DONE] No identificaron cuál algoritmo es cuál en los gráficos
 % Experimentación
-% La comparación con diferentes niveles de optimización en C tengo entendido que es parte del análisis preliminar.
-% Son dos experimentos simples (cambiar un par de instrucciones) o uno complejo, que involucre más cambio de código.
-% No identificaron cuál algoritmo es cuál en los gráficos
+% [DONE] La comparación con diferentes niveles de optimización en C tengo entendido que es parte del análisis preliminar.
+% [TODO] Son dos experimentos simples (cambiar un par de instrucciones) o uno complejo, que involucre más cambio de código.
+% [DONE] No identificaron cuál algoritmo es cuál en los gráficos
 
 \section{Convertir entre RGB e YUV}
 
@@ -83,21 +82,45 @@ Primero, se definen 3 máscaras. Cada una se utilizará para crear una de las co
 	\xmm{11} \xmmDoubleWordSmall{112}{-94}{-18}{0}
 \end{center}
 
-Para cada pixel, desempaquetamos sus componentes a tamaño doubleword. Esto es porque los valores que multiplicamos y sumamos pueden exceder el límite de una word, y perderíamos precisión o retornaríamos valores inválidos.
+Ya que contamos con registros de 128 bits y cada pixel mide 32 bits de ancho (RGBA), podemos cargar 4 pixeles de la memoria por iteración. Esto permite reducir el impacto de los accesos a memoria y los saltos condicionales.
 
-Cada pixel es copiado 3 veces, una por componente destino (en este caso, Y, U y V):
+No obstante, los mismos son desempaquetados para ocupar los registros XMM de manera individual, con cada una de sus componentes en tamaño doubleword (32 bits). Esto es porque los valores que multiplicamos y sumamos pueden exceder el límite de una word, y perderíamos precisión o retornaríamos valores inválidos. Esto también se refleja en la implementación C, donde consideramos utilizar \texttt{unsigned short}, de 16 bits, pero esto generaba demasiados errores y nos vimos forzados a usar \texttt{unsigned int}, de 32 bits.
+
+Por lo tanto, la lógica de procesamiento de cada pixel se ve repetida 4 veces, una por pixel por iteración. Sin embargo, tenemos la garantía que la imagen tendrá como ancho un múltiplo de 4, por lo que esto no presenta un problema.
 
 \begin{center}
 
-	\xmm{1} \xmmDoubleWordSmall{R}{G}{B}{0}
+	\xmm{0} \xmmDoubleWordSmall{0}{0}{0}{0}
 
-	\xmm{14} $\leftarrow$ \xmm{1}
+	\xmm{4} \xmmDoubleWordSmall{P1}{P2}{P3}{P4}
 
-	\xmm{15} $\leftarrow$ \xmm{1}
+	\xmm{2} $\leftarrow$ \xmm{4}
+
+	\texttt{PUNPCKHBW} \xmm{2}, \xmm{0} \hfill
+
+	\xmm{2} \xmmWord{$P1_R$}{$P1_G$}{$P1_B$}{0}{$P2_R$}{$P2_G$}{$P2_B$}{0}
+
+	\xmm{1} $\leftarrow$ \xmm{2}
+
+	\texttt{PUNPCKHWD} \xmm{1}, \xmm{0} \hfill
+
+	\texttt{PUNPCKLWD} \xmm{2}, \xmm{0} \hfill
+
+	\xmm{1} \xmmDoubleWordSmall{$P1_R$}{$P1_G$}{$P1_B$}{0}
+
+	\xmm{2} \xmmDoubleWordSmall{$P2_R$}{$P2_G$}{$P2_B$}{0}
+
+	$\vdots$
+
+	(se omiten instrucciones por su similitud)
+
+	\xmm{3} \xmmDoubleWordSmall{$P3_R$}{$P3_G$}{$P3_B$}{0}
+
+	\xmm{4} \xmmDoubleWordSmall{$P4_R$}{$P4_G$}{$P4_B$}{0}
 
 \end{center}
 
-Luego, se multiplican estas copias del pixel por la máscara correspondiente:
+Cada pixel es copiado 3 veces (en su registro original y a los registros XMM14 y XMM15), una por componente destino (en este caso, Y, U y V). Luego, se multiplican estas copias del pixel por la máscara correspondiente:
 
 \begin{center}
 
@@ -137,10 +160,33 @@ Como se puede ver, al sumar se genera un valor duplicado al final. El mismo se g
 
 Por último, estos componentes se denotan con $'$ porqe los mismos no son los valores finales: debemos aplicar 2 sumas y un shift a todos los componentes para finalizar la conversión. Para las sumas utilizamos nuevamente constantes precargadas en un registro XMM.
 
-Ya que contamos con registros de 128 bits y cada pixel mide 32 bits de ancho (RGBA), podemos cargar 4 pixeles de la memoria por iteración. Los mismos son empaquetados y desempaquetados, y la lógica se encuentra cuadruplicada para procesar todos. Esto se hace para reducir el impacto de los accesos a memoria y los saltos condicionales.
+Al finalizar la conversión, los pixeles son reempaquetados para ser guardados en una sola operación. El empaquetado es sin signo, de manera que cualquier valor por encima del máximo es acotado al máximo de dicha componente (\texttt{0xFF}):
+
+\begin{center}
+	\xmm{1} \xmmDoubleWordSmall{$P1_Y$}{$P1_U$}{$P1_V$}{0}
+
+	\xmm{2} \xmmDoubleWordSmall{$P2_Y$}{$P2_U$}{$P2_V$}{0}
+
+	\xmm{3} \xmmDoubleWordSmall{$P3_Y$}{$P3_U$}{$P3_V$}{0}
+
+	\xmm{4} \xmmDoubleWordSmall{$P4_Y$}{$P4_U$}{$P4_V$}{0}
+
+	\texttt{PACKUSDW} \xmm{2}, \xmm{1} \hfill
+
+	\xmm{2} \xmmWord{$P1_Y$}{$P1_U$}{$P1_V$}{0}{$P2_Y$}{$P2_U$}{$P2_V$}{0}
+
+	\texttt{PACKUSDW} \xmm{4}, \xmm{3} \hfill
+
+	\xmm{4} \xmmWord{$P3_Y$}{$P3_U$}{$P3_V$}{0}{$P4_Y$}{$P4_U$}{$P4_V$}{0}
+
+	\texttt{PACKUSWB} \xmm{4}, \xmm{2} \hfill
+
+	\xmm{4} \xmmDoubleWordSmall{P1}{P2}{P3}{P4}
+\end{center}
+
+(notese que en este contexto $Pi$ no representa el mismo pixel de entrada sino su correspondiente post-conversión)
 
 Un detalle importante que aplica a este filtro es la independencia entre todos los pixeles, y la independencia de los mismos con respecto a su posición. Este detalle nos permite recorrer la imagen no como una matriz de pixeles sino como una lista continua de tamaño $w \times h$.
-
 
 \subsection{Análisis preliminar}
 
