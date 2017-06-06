@@ -27,11 +27,12 @@ enable_language(ASM_NASM)
 if(CMAKE_ASM_NASM_COMPILER_LOADED)
     set(CAN_USE_ASSEMBLER TRUE)
     set(FILTER_FILES ${FILTER_FILES}
-            #src/filters/ASM_convert.asm
+            src/filters/ASM_convert.asm
             src/filters/ASM_fourCombine.asm
             src/filters/ASM_linearZoom.asm
             src/filters/ASM_maxCloser.asm
-            src/filters/ASM_convert_1pixel.asm)
+            #src/filters/ASM_convert_1pixel.asm
+    )
     set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -f elf64 -g -F DWARF")
 endif(CMAKE_ASM_NASM_COMPILER_LOADED)
 
