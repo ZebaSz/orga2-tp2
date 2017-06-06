@@ -41,61 +41,62 @@ Este filtro consiste en cambiar la distribución de píxeles de una imagen tal q
 El resultado visual que provoca la aplicación de este filtro es la sensación de que la imagen se dividió en cuatro pequeñas imágenes cuando verdaderamente ninguna de ella es igual a la otra. 
 Se puede ver en el ejemplo de la figura 1 como es la distribución que va teniendo la aplicación de nuestro filtro allí podemos distinguir que los píxeles antes y luego de la aplicación del filtro son los mismos.
 \begin{figure}[H]
-	\centering
-	\begin{subfigure}[b]{0.27\textwidth}
-		\centering
-		\begin{tikzpicture}
-		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
-		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-		\node[box, fill=red] at (-1.5,+1.50) {P1};
-		\node[box, fill=red] at (-0.50,+1.50) {P2};
-		\node[box, fill=orange] at (+0.50,+1.50) {P3};
-		\node[box, fill=orange] at (+1.5,+1.50) {P4};
-		\node[box, fill=red] at (-1.5,+0.50) {P5};
-		\node[box, fill=red] at (-0.50,+0.50) {P6};
-		\node[box, fill=orange] at (+0.50,+0.50) {P7};
-		\node[box, fill=orange] at (+1.50,+0.50) {P8};
-		\node[box, fill=yellow] at (-1.50,-0.50) {P9};
-		\node[box, fill=yellow] at (-0.50,-0.50) {P10};
-		\node[box] at (+0.50,-0.50) {P11};
-		\node[box] at (+1.50,-0.50) {P12};
-		\node[box, fill=yellow] at (-1.50,-1.50) {P13};
-		\node[box, fill=yellow] at (-0.50,-1.50) {P14};
-		\node[box] at (+0.50,-1.50) {P15};
-		\node[box] at (+1.50,-1.50) {P16};
-		\end{tikzpicture}
-	\end{subfigure}
-	{\LARGE$\xrightarrow{FourCombine}$}
-	\begin{subfigure}[b]{0.27\textwidth}
-		\centering
-		\begin{tikzpicture}
-		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
-		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-		\node[box, fill=red] at (-1.5,+1.50) {P1};
-		\node[box, fill=orange] at (-0.50,+1.50) {P3};
-		\node[box, fill=red] at (+0.50,+1.50) {P2};
-		\node[box, fill=orange] at (+1.5,+1.50) {P4};
-		\node[box, fill=yellow] at (-1.5,+0.50) {P9};
-		\node[box] at (-0.50,+0.50) {P11};
-		\node[box, fill=yellow] at (+0.50,+0.50) {P10};
-		\node[box] at (+1.50,+0.50) {P12};
+\begin{subfigure}[b]{0.27\textwidth}   
+\centering         
+\begin{tikzpicture}
+    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+\node[box, fill=red] at (-1.5,+1.50) {P16};
+\node[box, fill=red] at (-0.50,+1.50) {P15};
+\node[box, fill=orange] at (+0.50,+1.50) {P14};
+\node[box, fill=orange] at (+1.5,+1.50) {P13};
+\node[box, fill=red] at (-1.5,+0.50) {P12};
+\node[box, fill=red] at (-0.50,+0.50) {P11};
+\node[box, fill=orange] at (+0.50,+0.50) {P10};
+\node[box, fill=orange] at (+1.50,+0.50) {P09};
+\node[box, fill=yellow] at (-1.50,-0.50) {P08};
+\node[box, fill=yellow] at (-0.50,-0.50) {P07};
+\node[box] at (+0.50,-0.50) {P06};
+\node[box] at (+1.50,-0.50) {P05};
+\node[box, fill=yellow] at (-1.50,-1.50) {P04};
+\node[box, fill=yellow] at (-0.50,-1.50) {P03};
+\node[box] at (+0.50,-1.50) {P02};
+\node[box] at (+1.50,-1.50) {P01};
+\end{tikzpicture}
+\end{subfigure}
+{\LARGE$\xrightarrow{TRANSFORMACION}$}
+\begin{subfigure}[b]{0.27\textwidth} 
+\centering           
+\begin{tikzpicture}
+    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+\node[box, fill=red] at (-1.5,+1.50) {P16};
+\node[box, fill=orange] at (-0.50,+1.50) {P14};
+\node[box, fill=red] at (+0.50,+1.50) {P15};
+\node[box, fill=orange] at (+1.5,+1.50) {P13};
 
-		\node[box, fill=red] at (-1.50,-0.50) {P5};
-		\node[box, fill=orange] at (-0.50,-0.50) {P7};
-		\node[box, fill=red] at (+0.50,-0.50) {P6};
-		\node[box, fill=orange] at (+1.50,-0.50) {P8};
+\node[box, fill=yellow] at (-1.5,+0.50) {P08};
+\node[box] at (-0.50,+0.50) {P06};
+\node[box, fill=yellow] at (+0.50,+0.50) {P07};
+\node[box] at (+1.50,+0.50) {P05};
 
-		\node[box, fill=yellow] at (-1.50,-1.50) {P13};
-		\node[box] at (-0.50,-1.50) {P15};
-		\node[box, fill=yellow] at (+0.50,-1.50) {P14};
-		\node[box] at (+1.50,-1.50) {P16};
-		\end{tikzpicture}
-	\end{subfigure}
-	\caption{Distribución de píxeles tras aplicar el filtro de combinar}
+\node[box, fill=red] at (-1.50,-0.50) {P12};
+\node[box, fill=orange] at (-0.50,-0.50) {P10};
+\node[box, fill=red] at (+0.50,-0.50) {P11};
+\node[box, fill=orange] at (+1.50,-0.50) {P09};
+
+\node[box, fill=yellow] at (-1.50,-1.50) {P04};
+\node[box] at (-0.50,-1.50) {P02};
+\node[box, fill=yellow] at (+0.50,-1.50) {P03};
+\node[box] at (+1.50,-1.50) {P01};
+
+\end{tikzpicture}
+\end{subfigure}
+\caption{Distribución de píxeles tras aplicar el filtro de combinar}
 \end{figure}
 
 También podemos ver en la figura 2 cual es el impacto de nuestro filtro en una imagen real, podremos notar aquí lo parecidas que son imágenes resultantes en cada uno de los cuadrantes, a nuestro ojo es casi imperceptible la diferencia.
@@ -122,7 +123,7 @@ En cuanto a la implementación en código assembler se tuvo que pensar una soluc
 \item Ya que íbamos a tomar de a 8 píxeles contiguos pero el enunciado del trabajo practico solo aseguraba que la imagen a lo ancho iba a ser múltiplo de 4 , teníamos que hacer algo con respecto a los casos donde la imagen no era múltiplo de 8. En este caso tratamos de emular un poco la practica que realiza muchas veces el compilador de intel donde este separa el código en casos especiales para poder ahorrarse de preguntar en el medio del código . Por ende en nuestro código ASM solo preguntamos una vez si el ancho es múltiplo de 4 o de 8 y dependiendo de eso el código se disfurca en dos
 \end{itemize}
 
-Ahora hablemos un poco mas de la iteración dentro del un ciclo de nuestro código ASM , podemos separar lo que hace dentro de una columna de lo que hace al cambiar de fila. Dentro de una columna nuestro objetivo es agarrar 8 píxeles llámense $Pi$ con $1\leq i\leq 8$ y trabajarlos de forma tal que queden listos para ser pegados en la memoria de la imagen destino. El siguiente gráfico nos mostrara como ocurre la transformación de los 8 píxeles desde que son extraídos desde la imagen fuente hasta que están listos para ser puestos en la imagen destino:
+Ahora hablemos un poco mas de la iteración dentro del un ciclo de nuestro código ASM , podemos separar lo que hace dentro de una columna de lo que hace al cambiar de fila. Dentro de una columna nuestro objetivo es agarrar 8 píxeles desde el puntero $RDI$, agarrando primero cuatro y guardarlo en $XMM2, XMM4$ , moverse y agarrar cuatro mas y guardarlo en $XMM3, XMM5$ llámense $Pi$ con $1\leq i\leq 8$ y trabajarlos de forma tal que queden listos para ser pegados en la memoria de la imagen destino. El siguiente gráfico nos mostrara como ocurre la transformación de los 8 píxeles desde que son extraídos desde la imagen fuente hasta que están listos para ser puestos en la imagen destino : 
 
 \begin{center}
 	\begin{tikzpicture}
@@ -365,10 +366,12 @@ En el único momento que vamos a utilizar datos por fuera de la cátedra va a se
 	\label{sec:ticksciclo}
 \end{figure}
 
-Podemos distinguir de la figura 3 que hay una mejora a medida que la imagen se va haciendo cada vez mas grande en el algoritmo de desarrollo del ciclo, esto nos estaría indicando a simple vista que el método funciona, podríamos tener alguna desventaja ya que nuestro programa estaría pesando mas de lo normal, pero esto no sería algo que tenga importancia en un programa como el desarrollado. También se puede hablar de la comparación en imágenes chicas viendo la figura 4. En este caso se trabajo con los resultados mas chicos del set de resultados para poder ver que tan distintos o iguales eran los algoritmos y se puede notar que en imágenes chicas no hay casi diferencia de performance, esto tiene sentido pensando que en imágenes chicas no existe una cantidad de saltos que pueda llegar a influir en la predicción de saltos del procesador.
+\subsubsection*{Explicación e interpretación de los resultados obtenidos}
+Podemos distinguir de la figura~\ref{sec:unroolvsnormal} que hay una mejora a medida que la imagen se va haciendo cada vez mas grande en el algoritmo de desarrollo del ciclo, esto nos estaría indicando a simple vista que el método funciona, podríamos tener alguna desventaja ya que nuestro programa estaría pesando mas de lo normal, pero esto no sería algo que tenga importancia en un programa como el desarrollado. También se puede hablar de la comparación en imágenes chicas viendo la figura~\ref{sec:unroolvsnormal_asmOnly} . En este caso se trabajo con los resultados mas chicos del set de resultados para poder ver que tan distintos o iguales eran los algoritmos y se puede notar que en imágenes chicas no hay casi diferencia de performance, esto tiene sentido pensando que en imágenes chicas no existe una cantidad de saltos que pueda llegar a influir en la predicción de saltos del procesador.
 
-Por ultimo una manera interesante de ver la diferencia de la performance que se nos ocurrió fue la de medir un ciclo de cada algoritmo y ver que tan performante era cada uno luego de hacer la modificación a esto como se indica en la sección de "como y que van a medir" se puede observar otra manera como la implementación de UNROLL lograr obtener un tiempo que es al menos dos veces mejor que el método puesto en nuestro TP. Este resultado parece contradecir los anteriores dos ya que en estos no se observa que los resultados del UNROLL sean dos veces mejores. No fue testeado pero mi hipótesis recae a que el trabajo que se debe hacer cada vez que se cambia de fila es mayor cuando estamos haciendo el UNROLL , tal vez por la misma ineficiencia de la implementación. Pero este resultado nos muestra el potencial que tiene el UNROLL al poder tener un mejor tiempo de procesamiento por píxel.
+Por ultimo en la figura~\ref{sec:ticksciclo} una manera interesante de ver la diferencia de la performance que se nos ocurrió fue la de medir un ciclo de cada algoritmo y dividirlo por la cantidad de pixeles que procesan en ese ciclo y asi ver que tan performante era cada uno luego de hacer la modificación a esto como se indica en la sección de "como y que van a medir" se puede observar otra manera como la implementación de UNROLL lograr obtener un tiempo que es al menos dos veces mejor que el método puesto en nuestro TP. Este resultado parece contradecir los anteriores dos ya que en estos no se observa que los resultados del UNROLL sean dos veces mejores. No fue testeado pero mi hipótesis recae a que el trabajo que se debe hacer cada vez que se cambia de fila es mayor cuando estamos haciendo el UNROLL , tal vez por la misma ineficiencia de la implementación. Pero este resultado nos muestra el potencial que tiene el UNROLL al poder tener un mejor tiempo de procesamiento por píxel.
 
-Por ultimo voy a hablar de mi test sobre la cache sobre el cual solo quedan los resultados y no hay gráfico asociado . Temo que la  hipótesis que teníamos no se pudo probar ya que los mejores tiempo tanto para el código ASM original como para el ASM - UNROLL son los siguientes :  $243442734$ ticks y $220905687$ ticks respectivamente , hay una mejora de al menos $10\%$ en promedio , cuando se esperaba que al poder leer por filas en nuestro ASM original se podría conseguir una hit rate mas grande. 
-\subsection{Conclusiones}
-En conclusión el unroll aplicado al algoritmo original logro aumentar la performance mas denotada en imágenes mas grandes. El poder procesar mas píxeles hace que el ciclo sea mas corto y por lo tanto es ahí donde gana tiempo. El algoritmo se podría mejorar para evitar perder tanto tiempo cuando se cambia de fila.
+Por ultimo voy a hablar de mi test sobre la cache sobre el cual solo quedan los resultados y no hay gráfico asociado . Temo que la  hipótesis que teníamos no se pudo probar ya que al poner en perspectiva los mejores tiempo tanto para el código ASM original como para el ASM - UNROLL el resulto mostro una mejora de al menos $10\%$, cuando se esperaba que al poder leer por filas en nuestro ASM original se podría conseguir una hit rate mas grande. 
+
+\subsection{Trabajos Futuros}
+Un experimento interesante que debería estar incluido en el tp sería poder medir que porcentaje de un ciclo del algoritmo presentado como respuesta se utiliza cargando datos, que porcentaje en procesarlos y que porcentaje en cargarlos nuevamente a memoria, tenemos la impresión que la gran mayoría del tiempo se la pasa cargando y poniendo cosas en memoria por ende si quisiéramos mejorar aun mas nuestro algoritmo podríamos solamente trabajar sobre el porcentaje de procesamiento de los datos. Estaríamos en presencia de un cuello de botella representado por la memoria.
