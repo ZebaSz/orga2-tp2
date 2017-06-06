@@ -1,20 +1,3 @@
-% RGB <-> YUV
-% Implementación
-% [DONE] No queda claro por qué eligen calcular de a un sólo pixel.
-% [DONE] No aclaran el tipo de desempaquetado que utilizan, o cómo dejan el registro (XMM1) como está al comienzo. Al final explican que esta operación la repiten 4 veces, pero no aclaran igualmente por qué decidieron desempaquetar a dw.
-% [TODO] Hubiera quedado más claro si ponían los ejemplos de los registros que ejemplifican las máscaras justo debajo del texto que las nombra.
-% [DONE] No cuentan de qué algoritmo están contando la implementación, si de RGB a YUV o al revés
-% [DONE] En la explicación del valor repetido, escriben "El mismo no la correción del filtro" a qué se refieren?
-% Análisis preliminar
-% [DONE] Intenten ser lo más precisos posible con el detalle de la experimentación.
-% [DONE] En qué plataforma se corrió? 
-% [DONE] Dónde pusieron los mecanismos de medición? Al hacer una llamada al filtro? Al comenzar a ejecutar el tp2? Cuántas veces lo corrieron (exactamente)?
-% [DONE] No identificaron cuál algoritmo es cuál en los gráficos
-% Experimentación
-% [DONE] La comparación con diferentes niveles de optimización en C tengo entendido que es parte del análisis preliminar.
-% [TODO] Son dos experimentos simples (cambiar un par de instrucciones) o uno complejo, que involucre más cambio de código.
-% [DONE] No identificaron cuál algoritmo es cuál en los gráficos
-
 \section{Convertir entre RGB e YUV}
 
 Los primeros filtros se tratan de conversores entre los espacios de colores RGB e YUV. Los mismos toman los valores de cada pixel y aplican transformaciones matriciales, tomando cada pixel individual como una matriz de sus componentes.
@@ -198,18 +181,38 @@ Como ambos filtros son muy similares, los podemos comparar lado a lado:
 	\includegraphics[scale=0.5]{img/conversores_CvsASMvsO3.png}
 \end{center}
 
-Por un lado, se puede notar una diferencia enorme en la performance del algoritmo escrito en C contra el escrito en ASM. Al compilar con optimizaciones, la brecha de performance baja drásticamente. Sospechamos que esto se debe a un uso más exhaustivo de los registros en lugar de acceder constantemente a memoria. Sin embargo, se puede ver que el algoritmo escrito con instrucciones SIMD sigue siendo más óptimo (hasta casi 60\% del tiempo, 2090676 en ASM vs 3377772 en C con \texttt{-O3}). Si bien la diferencia es visiblemente menor, y nuestras mediciones contaron con un poco de ruido, la diferencia porcentual es visible y relevante.
+Por un lado, se puede notar una diferencia enorme en la performance del algoritmo escrito en C contra el escrito en ASM. Al compilar con optimizaciones, la brecha de performance baja drásticamente. Sospechamos que esto se debe a un uso más exhaustivo de los registros en lugar de acceder constantemente a memoria. Sin embargo, se puede ver que el algoritmo escrito con instrucciones SIMD sigue siendo más óptimo (hasta casi 60\% del tiempo, 2090676 en ASM vs 3377772 en C con \texttt{-O3}). Si bien la diferencia es notablemente menor, la diferencia porcentual es visible y relevante.
 
 Por otro lado, se puede ver que en O0 el conversor YUV a RGB performa mejor que su contraparte RGB a YUV (con una diferencia de más de 10\%). Esto posiblemente se deba a ciertas operaciones que como mencionamos se repiten, y por ende podemos pre-calcular y reutilizar valores intermedios.
 
 \subsection{Experimentación}
 
-A modo de experimentación, decidimos probar con distintas imágenes con distintas proporciones. Los aspectos generales de la experimentación se encuentran detallado en los apéndices.
+A modo de experimentación, decidimos probar 2 hipótesis distintas:
+
+\subsubsection*{Hipótesis 1: cargar 4 pixeles a la vez mejora la performance}
+
+Como se mencionó en la sección de implementación, en nuestra implementación cargamos 4 pixeles de la memoria a los registros XMM, para luego desempaquetarlos y procesarlos de manera individual. Nosotros hicimos esto bajo la hipótesis que reducir los saltos y los accesos a memoria mejoraría el rendimiento de los filtros.
+
+Decidimos comprobar esta teoría implementando los mismos filtros pero cargando y procesando 1 único pixel por iteración:
+
+\begin{center}
+	\includegraphics[scale=0.5]{img/conversores_1pixel.png}
+\end{center}
+
+Efectivamente, las implementaciones más veloces son aquellas que aprovechan la instrucción \texttt{movdqu} para cargar 4 pixeles con un solo acceso a memoria, y que consecuentemente procesan 4 pixeles sin hacer saltos.
+
+Por otro lado, al acceder de manera lineal a la memoria, el caché debería mitigar una gran candidad de esos accesos, así que es posible que el impacto mayor no provenga necesariamente de los accesos a memoria, sino de los saltos condicionales.
+
+\subsubsection*{Hipótesis 2: los filtros corren en tiempos uniformes para toda imagen de mismo tamaño}
+
+De cara a la experimentación, esperábamos que los algoritmos fuesen agnósticos a la composición de la imagen de entrada, es decir, de los pixeles particulares que la componen. Si bien sabemos que el tamaño de la imagen si afecta de forma lineal el tiempo de ejecución, supusimos que los colores que componen las imágenes no modificarían dicho tiempo.
+
+Para comprobar esta teoría, probamos correr el conversor sobre utilizando un bitmap blanco. Corrimos los mismos conversores, en ambas implementaciones:
 
 \begin{center}
 	\includegraphics[scale=0.5]{img/conversores_blanco.png}
 \end{center}
 
-De cara a la experimentación, esperábamos que los algoritmos fuesen agnósticos a la mayoría de los detalles de la entrada. Sin embargo, al probar utilizando un bitmap blanco, podemos ver que la saturación de las componentes tiene un efecto visible en el tiempo de ejecución de los filtros. No solo eso, el bitmap afecta de manera positiva a la implementación en C, mientras que impacta de forma negativa a su contraparte SSE.
+Para nuestra sorpresa, podemos ver que la saturación de las componentes tiene un efecto visible en el tiempo de ejecución de los filtros. No solo eso, el bitmap afecta de manera positiva a la implementación en C, mientras que impacta de forma negativa a su contraparte SSE.
 
-Nuestra teoría frente a esto es que la saturación puede ser optimizada en el caso de C (se pueden evitar algunos cálculos si se ve que el resultado estará saturado). Por otro lado, en ASM el procesador detecta que los componentes generan overflow y debe realizar el ajuste necesario para conservar un valor válido y saturado.
+Este dato nos tomó por sorpresa, y aunque intentamos analizar el por qué de este impacto, no pudimos dilucidar la causa. De un modo u otro, esto muestra que la imagen de entrada pueden afectar notoriamente la performance de los filtros, negando nuestra hipótesis inicial.
