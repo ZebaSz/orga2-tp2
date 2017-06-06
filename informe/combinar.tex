@@ -1,6 +1,6 @@
 % Descripción
 % La propiedad lógica descripta sólo dice que la imagen resultante va a tener la misma cantidad de pixeles y el mismo ancho, pero no describe la imagen resultante en cuestión, no le veo mucho sentido.
-% La imagen de la transformación está al revés
+% [DONE] La imagen de la transformación está al revés
 % Implementación
 % La descripción de qué se hace con los punteros a los cuadrantes necesita una re-escritura.
 % El código presentado no es claro, qué tienen r10 y r11?
@@ -20,11 +20,11 @@
 % Como nos interesa saber cómo se comportan ambas modificaciones con diferentes tamaños de imágenes, en especial ver cómo se comporta con imágenes más grandes que la caché, utilizamos como entrada imágenes de tamaño x, y, z...
 % Para tener un análisis más granular de los tiempos de ejecución de los ciclos, medimos de x manera, con este CPU, z veces y tomamos la media.
 % Resultados obtenidos
-% El número de la figura al comienzo dice 3 (es 4?)
+% [DONE] El número de la figura al comienzo dice 3 (es 4?)
 % El programa pesa más de lo normal? Si se refieren al espacio en memoria que ocupa el código, es muy poco.
 % Cuando hacen el análisis del ciclo, cómo lo hicieron? Si el ciclo del unroll es más largo, debería tardar más.
 % Sólo incluyan el porcentaje de diferencia, los tics no muestran mucho a simple vista. No queda claro de dónde salió ese 10%, del promedio con las imágenes de distintos tamaños?
-% No tiene mucho sentido tener el tiempo de ejecución de C cuando no lo necesitan para su experimentación.
+% [DONE] No tiene mucho sentido tener el tiempo de ejecución de C cuando no lo necesitan para su experimentación.
 % Conclusiones
 % [DONE] Las conclusiones deberían ser generales, al final del informe. El problema de ponerlas en cada filtro es que no pueden sacar conclusiones de todo el trabajo en cuestión.
 
@@ -39,67 +39,69 @@ Este filtro consiste en cambiar la distribución de píxeles de una imagen tal q
 \end{flushright}
 
 El resultado visual que provoca la aplicación de este filtro es la sensación de que la imagen se dividió en cuatro pequeñas imágenes cuando verdaderamente ninguna de ella es igual a la otra. 
-Se puede ver en el ejemplo de la figura 1 como es la distribución que va teniendo la aplicación de nuestro filtro allí podemos distinguir que los píxeles antes y luego de la aplicación del filtro son los mismos.
+Se puede ver en el ejemplo de la figura~\ref{fourCombine_transform} como es la distribución que va teniendo la aplicación de nuestro filtro allí podemos distinguir que los píxeles antes y luego de la aplicación del filtro son los mismos.
 \begin{figure}[H]
-\begin{subfigure}[b]{0.27\textwidth}   
-\centering         
-\begin{tikzpicture}
-    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        box/.style={rectangle,draw=black,thick, minimum size=1cm},
-    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-\node[box, fill=red] at (-1.5,+1.50) {P16};
-\node[box, fill=red] at (-0.50,+1.50) {P15};
-\node[box, fill=orange] at (+0.50,+1.50) {P14};
-\node[box, fill=orange] at (+1.5,+1.50) {P13};
-\node[box, fill=red] at (-1.5,+0.50) {P12};
-\node[box, fill=red] at (-0.50,+0.50) {P11};
-\node[box, fill=orange] at (+0.50,+0.50) {P10};
-\node[box, fill=orange] at (+1.50,+0.50) {P09};
-\node[box, fill=yellow] at (-1.50,-0.50) {P08};
-\node[box, fill=yellow] at (-0.50,-0.50) {P07};
-\node[box] at (+0.50,-0.50) {P06};
-\node[box] at (+1.50,-0.50) {P05};
-\node[box, fill=yellow] at (-1.50,-1.50) {P04};
-\node[box, fill=yellow] at (-0.50,-1.50) {P03};
-\node[box] at (+0.50,-1.50) {P02};
-\node[box] at (+1.50,-1.50) {P01};
-\end{tikzpicture}
-\end{subfigure}
-{\LARGE$\xrightarrow{TRANSFORMACION}$}
-\begin{subfigure}[b]{0.27\textwidth} 
-\centering           
-\begin{tikzpicture}
-    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        box/.style={rectangle,draw=black,thick, minimum size=1cm},
-    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-\node[box, fill=red] at (-1.5,+1.50) {P16};
-\node[box, fill=orange] at (-0.50,+1.50) {P14};
-\node[box, fill=red] at (+0.50,+1.50) {P15};
-\node[box, fill=orange] at (+1.5,+1.50) {P13};
+	\centering
+	\begin{subfigure}[b]{0.27\textwidth}
+		\centering
+		\begin{tikzpicture}
+		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+		\node[box, fill=red] at (-1.5,+1.50) {P16};
+		\node[box, fill=red] at (-0.50,+1.50) {P15};
+		\node[box, fill=orange] at (+0.50,+1.50) {P14};
+		\node[box, fill=orange] at (+1.5,+1.50) {P13};
+		\node[box, fill=red] at (-1.5,+0.50) {P12};
+		\node[box, fill=red] at (-0.50,+0.50) {P11};
+		\node[box, fill=orange] at (+0.50,+0.50) {P10};
+		\node[box, fill=orange] at (+1.50,+0.50) {P09};
+		\node[box, fill=yellow] at (-1.50,-0.50) {P08};
+		\node[box, fill=yellow] at (-0.50,-0.50) {P07};
+		\node[box] at (+0.50,-0.50) {P06};
+		\node[box] at (+1.50,-0.50) {P05};
+		\node[box, fill=yellow] at (-1.50,-1.50) {P04};
+		\node[box, fill=yellow] at (-0.50,-1.50) {P03};
+		\node[box] at (+0.50,-1.50) {P02};
+		\node[box] at (+1.50,-1.50) {P01};
+		\end{tikzpicture}
+	\end{subfigure}
+	{\LARGE$\xrightarrow{FourCombine}$}
+	\begin{subfigure}[b]{0.27\textwidth}
+		\centering
+		\begin{tikzpicture}
+		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+		\node[box, fill=red] at (-1.5,+1.50) {P16};
+		\node[box, fill=orange] at (-0.50,+1.50) {P14};
+		\node[box, fill=red] at (+0.50,+1.50) {P15};
+		\node[box, fill=orange] at (+1.5,+1.50) {P13};
 
-\node[box, fill=yellow] at (-1.5,+0.50) {P08};
-\node[box] at (-0.50,+0.50) {P06};
-\node[box, fill=yellow] at (+0.50,+0.50) {P07};
-\node[box] at (+1.50,+0.50) {P05};
+		\node[box, fill=yellow] at (-1.5,+0.50) {P08};
+		\node[box] at (-0.50,+0.50) {P06};
+		\node[box, fill=yellow] at (+0.50,+0.50) {P07};
+		\node[box] at (+1.50,+0.50) {P05};
 
-\node[box, fill=red] at (-1.50,-0.50) {P12};
-\node[box, fill=orange] at (-0.50,-0.50) {P10};
-\node[box, fill=red] at (+0.50,-0.50) {P11};
-\node[box, fill=orange] at (+1.50,-0.50) {P09};
+		\node[box, fill=red] at (-1.50,-0.50) {P12};
+		\node[box, fill=orange] at (-0.50,-0.50) {P10};
+		\node[box, fill=red] at (+0.50,-0.50) {P11};
+		\node[box, fill=orange] at (+1.50,-0.50) {P09};
 
-\node[box, fill=yellow] at (-1.50,-1.50) {P04};
-\node[box] at (-0.50,-1.50) {P02};
-\node[box, fill=yellow] at (+0.50,-1.50) {P03};
-\node[box] at (+1.50,-1.50) {P01};
+		\node[box, fill=yellow] at (-1.50,-1.50) {P04};
+		\node[box] at (-0.50,-1.50) {P02};
+		\node[box, fill=yellow] at (+0.50,-1.50) {P03};
+		\node[box] at (+1.50,-1.50) {P01};
 
-\end{tikzpicture}
-\end{subfigure}
-\caption{Distribución de píxeles tras aplicar el filtro de combinar}
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{Distribución de píxeles tras aplicar el filtro de combinar}
+	\label{fourCombine_transform}
 \end{figure}
 
-También podemos ver en la figura 2 cual es el impacto de nuestro filtro en una imagen real, podremos notar aquí lo parecidas que son imágenes resultantes en cada uno de los cuadrantes, a nuestro ojo es casi imperceptible la diferencia.
+También podemos ver en la figura~\ref{fourCombine_example} cual es el impacto de nuestro filtro en una imagen real, podremos notar aquí lo parecidas que son imágenes resultantes en cada uno de los cuadrantes, a nuestro ojo es casi imperceptible la diferencia.
 
 \begin{figure}[H]
 	\centering
@@ -108,6 +110,7 @@ También podemos ver en la figura 2 cual es el impacto de nuestro filtro en una 
 	$\vcenter{\hbox{\includegraphics[scale=0.38]{img/fourCombine_after.jpg}}}$
 
 	\caption{Imagen real antes y luego de la aplicación del filtro}
+	\label{fourCombine_example}
 \end{figure}
 
 \subsection{Implementación}
@@ -349,27 +352,26 @@ En el único momento que vamos a utilizar datos por fuera de la cátedra va a se
 	\centering
 	\includegraphics[scale=0.5]{img/fourCombine_UnrollvsNormal.png}
 	\caption{Versión Unroll del algoritmo puesta en comparación del entregado como respuesta del tp}
-	\label{sec:unroolvsnormal}
+	\label{fourCombine_unroolvsnormal}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.5]{img/fourCombine_UnrollvsNormal_asmOnly.png}
 	\caption{Comparación exclusiva de las implementaciones en ASM}
-	\label{sec:unroolvsnormal_asmOnly}
+	\label{fourCombine_unroolvsnormal_asmOnly}
 \end{figure}
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.5]{img/fourCombine_ticks_en_ciclo.png}
 	\caption{Ticks en un ciclo comparación de las 3 implementaciones}
-	\label{sec:ticksciclo}
+	\label{fourCombine_ticksciclo}
 \end{figure}
 
-\subsubsection*{Explicación e interpretación de los resultados obtenidos}
-Podemos distinguir de la figura~\ref{sec:unroolvsnormal} que hay una mejora a medida que la imagen se va haciendo cada vez mas grande en el algoritmo de desarrollo del ciclo, esto nos estaría indicando a simple vista que el método funciona, podríamos tener alguna desventaja ya que nuestro programa estaría pesando mas de lo normal, pero esto no sería algo que tenga importancia en un programa como el desarrollado. También se puede hablar de la comparación en imágenes chicas viendo la figura~\ref{sec:unroolvsnormal_asmOnly} . En este caso se trabajo con los resultados mas chicos del set de resultados para poder ver que tan distintos o iguales eran los algoritmos y se puede notar que en imágenes chicas no hay casi diferencia de performance, esto tiene sentido pensando que en imágenes chicas no existe una cantidad de saltos que pueda llegar a influir en la predicción de saltos del procesador.
+Podemos distinguir de la figura~\ref{fourCombine_unroolvsnormal} que hay una mejora a medida que la imagen se va haciendo cada vez mas grande en el algoritmo de desarrollo del ciclo, esto nos estaría indicando a simple vista que el método funciona, podríamos tener alguna desventaja ya que nuestro programa estaría pesando mas de lo normal, pero esto no sería algo que tenga importancia en un programa como el desarrollado. También se puede hablar de la comparación en imágenes chicas viendo la figura~\ref{fourCombine_unroolvsnormal_asmOnly} . En este caso se trabajo con los resultados mas chicos del set de resultados para poder ver que tan distintos o iguales eran los algoritmos y se puede notar que en imágenes chicas no hay casi diferencia de performance, esto tiene sentido pensando que en imágenes chicas no existe una cantidad de saltos que pueda llegar a influir en la predicción de saltos del procesador.
 
-Por ultimo en la figura~\ref{sec:ticksciclo} una manera interesante de ver la diferencia de la performance que se nos ocurrió fue la de medir un ciclo de cada algoritmo y dividirlo por la cantidad de pixeles que procesan en ese ciclo y asi ver que tan performante era cada uno luego de hacer la modificación a esto como se indica en la sección de "como y que van a medir" se puede observar otra manera como la implementación de UNROLL lograr obtener un tiempo que es al menos dos veces mejor que el método puesto en nuestro TP. Este resultado parece contradecir los anteriores dos ya que en estos no se observa que los resultados del UNROLL sean dos veces mejores. No fue testeado pero mi hipótesis recae a que el trabajo que se debe hacer cada vez que se cambia de fila es mayor cuando estamos haciendo el UNROLL , tal vez por la misma ineficiencia de la implementación. Pero este resultado nos muestra el potencial que tiene el UNROLL al poder tener un mejor tiempo de procesamiento por píxel.
+Por ultimo en la figura~\ref{fourCombine_ticksciclo} una manera interesante de ver la diferencia de la performance que se nos ocurrió fue la de medir un ciclo de cada algoritmo y dividirlo por la cantidad de pixeles que procesan en ese ciclo y asi ver que tan performante era cada uno luego de hacer la modificación a esto como se indica en la sección de "como y que van a medir" se puede observar otra manera como la implementación de UNROLL lograr obtener un tiempo que es al menos dos veces mejor que el método puesto en nuestro TP. Este resultado parece contradecir los anteriores dos ya que en estos no se observa que los resultados del UNROLL sean dos veces mejores. No fue testeado pero mi hipótesis recae a que el trabajo que se debe hacer cada vez que se cambia de fila es mayor cuando estamos haciendo el UNROLL , tal vez por la misma ineficiencia de la implementación. Pero este resultado nos muestra el potencial que tiene el UNROLL al poder tener un mejor tiempo de procesamiento por píxel.
 
 Por ultimo voy a hablar de mi test sobre la cache sobre el cual solo quedan los resultados y no hay gráfico asociado . Temo que la  hipótesis que teníamos no se pudo probar ya que al poner en perspectiva los mejores tiempo tanto para el código ASM original como para el ASM - UNROLL el resulto mostro una mejora de al menos $10\%$, cuando se esperaba que al poder leer por filas en nuestro ASM original se podría conseguir una hit rate mas grande. 
 
