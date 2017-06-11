@@ -181,7 +181,15 @@ Como ambos filtros son muy similares, los podemos comparar lado a lado:
 	\includegraphics[scale=0.5]{img/conversores_CvsASMvsO3.png}
 \end{center}
 
-Por un lado, se puede notar una diferencia enorme en la performance del algoritmo escrito en C contra el escrito en ASM. Al compilar con optimizaciones, la brecha de performance baja drásticamente. Sospechamos que esto se debe a un uso más exhaustivo de los registros en lugar de acceder constantemente a memoria. Sin embargo, se puede ver que el algoritmo escrito con instrucciones SIMD sigue siendo más óptimo (hasta casi 60\% del tiempo, 2090676 en ASM vs 3377772 en C con \texttt{-O3}). Si bien la diferencia es notablemente menor, la diferencia porcentual es visible y relevante.
+Lo primero que se puede apreciar en este gráfico es que, más allá de la implementación utilizada, el tiempo de ejecución del filtro aumenta de forma lineal con el tamaño de la imagen, en este caso medido en pixeles. Cabe destacar que en nuestras mediciones, los casos de imágenes pequeñas dieron resultados dispares, pero para el resto de los tamaños esta tendencia se mantiene.
+
+Para continuar, se puede notar una diferencia enorme en la performance del algoritmo escrito en C contra el escrito en ASM. Al compilar con optimizaciones, la brecha de performance baja drásticamente. Sospechamos que esto se debe a un uso más exhaustivo de los registros en lugar de acceder constantemente a memoria. Sin embargo, se puede ver que el algoritmo escrito con instrucciones SIMD sigue siendo más óptimo. Decidimos analizar esto más de cerca:
+
+\begin{center}
+	\includegraphics[scale=0.5]{img/conversores_CvsASMvsO3_bars.png}
+\end{center}
+
+Este gráfico nos muestra de forma clara que el filtro escrito en ASM se ejecuta en entre 50\% y 70\% del tiempo al compararlo con el filtro en C compilado con el flag \texttt{-O3}. Si bien ambos filtros se ejecutan varias veces más rápido que la versión sin optimizaciones de compilador (\texttt{-O0}), la diferencia porcentual entre ellos es visible y relevante.
 
 Por otro lado, se puede ver que en O0 el conversor YUV a RGB performa mejor que su contraparte RGB a YUV (con una diferencia de más de 10\%). Esto posiblemente se deba a ciertas operaciones que como mencionamos se repiten, y por ende podemos pre-calcular y reutilizar valores intermedios.
 

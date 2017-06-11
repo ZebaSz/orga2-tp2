@@ -308,21 +308,30 @@ Lo único que cambia de esta explicación con respecto a cuando el ancho no es m
 
 \subsection{Análisis preliminar}
 
-\begin{figure}[H]
-	\centering
+\begin{center}
 	\includegraphics[scale=0.5]{img/fourCombine_CvsASMvsO3.png}
-	\caption{Comparación llana de las implementaciones en C contra la implementación en ASM}
-\end{figure}
+\end{center}
 
-Luego de sacar manualmente un poco del ruido podemos ver una clara diferencia entre la implementación de C y la de ASM. Dato curioso que podemos agregar entre la diferencia de O0 y O3 es que al momento de compilar con gcc ( gracias a la herramienta \url{https://godbolt.org/} ) se puede apreciar como una linea de código se vuelve ASM dependiendo el flag. 
+Al igual que los conversores, el tiempo de ejecución del filtro es una función lineal del tamaño de la imagen en pixeles. Este comportamiento era esperado, ya que los mismos solo deben moverse a la memoria destino, lo cual es una operación de tiempo constante.
 
-Después de analizarlo los resultados tanto en O0 como en O3 podemos ver que esta linea de código :
+Nuevamente, algunas mediciones con imágenes más pequeñas tienen ruido visible, pero la pendiente de crecimiento del gráfico se mantiene.
+
+\begin{center}
+	\includegraphics[scale=0.5]{img/fourCombine_CvsASMvsO3_bars.png}
+\end{center}
+
+En términos de performance, podemos ver que la versión implementada con SSE opera en aproximadamente 45\% del tiempo que la versión optimizada de C.
+
+
+Para este caso particular, decidimos analizar el ensamblador generado por \texttt{gcc} tanto para \texttt{-O0} como para \texttt{-O3}. Para esto usamos la herramienta Compiler Explorer (\url{https://godbolt.org/}), que nos permitió analizar el código y sus cambios en vivo, asociando cada linea de código C con su correspondiente en ASM.
+
+Una linea en particular que nos llamó la atención fue la siguiente
 
 \begin{lstlisting}
 		mDst[offsetH + (h >> 1)][offsetW + (w >> 1)] = mSrc[h][w];
 \end{lstlisting}
 
-Cuando se encuentra el flag de O0 activado $h >> 1$ se calcula todas las veces, en cambio cuando el flag de O3 esta activo esto no sucede y se calcula antes de ciclar. Existen otras mejoras pero el nivel del código no nos permitió encontrarlas. Nos pareció interesante en este gráfico dejar todos tiempos que fuimos midiendo para ver que tal se comporta el ordenador cuando medimos tiempos aunque hay un poco de outliners la gran mayoría de los tiempos rondan en lo mismo.
+Cuando no se activa ninguna optimización, $h >> 1$ se calcula cada vez que se necesita, en cada iteración del ciclo. En cambio, al activar las optimizaciones, ese valor se calcula y almacena antes de comenzar el ciclo. Existen otras mejoras pero el nivel del código no nos permitió apreciar grandes diferencias.
 
 \subsection{Hipótesis de trabajo}
 

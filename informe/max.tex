@@ -122,7 +122,13 @@ Ya conseguido el máximo, ahora tenemos que realizar la combinación lineal con 
 	\includegraphics[scale=0.5]{img/maxCloser_CvsASMvsO3.png}
 \end{center}
 
-Podemos ver claramente como el filtro implementado en ASM corre más rápido que en C, de hecho, al incrementar el tamaño de la imagen la diferencia es aún más notable. Si bien hay una amplia mejora al compilar con optimizaciones O3, no llega a mejorar la versión de ASM. Es más, la diferencia es la mayor entre todos los filtros estudiados: la implementación en ASM corren en menos de 20\% del tiempo en promedio para una misma imagen.
+Podemos ver claramente como el filtro implementado en ASM corre más rápido que en C, de hecho, al incrementar el tamaño de la imagen la diferencia es aún más notable. Si bien hay una amplia mejora al compilar con optimizaciones \texttt{-O3}, no llega a mejorar la versión de ASM.
+
+\begin{center}
+	\includegraphics[scale=0.5]{img/maxCloser_CvsASMvsO3_bars.png}
+\end{center}
+
+Analizando de cerca, podemos ver que la diferencia entre las distintas implementaciones es la mayor entre todos los filtros estudiados: la implementación en ASM corren en menos de 25\% del tiempo en promedio para una misma imagen.
 
 Esto es un comportamiento esperable ya que en C estamos yendo a buscar el pixel a memoria por cada pixel del kernel, en cambio en ASM con las instrucciones SIMD cada 7 pixeles lo pedimos 2 veces. Además, en ASM aprovechamos y hacemos las cuentas para el pixel destino en paralelo.
 
