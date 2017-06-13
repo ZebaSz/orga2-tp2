@@ -233,4 +233,4 @@ Con esto en mente, decidimos modificar nuestro filtro para que utilice dichas in
   \includegraphics[scale=0.5]{img/linearZoom_shuf_bars.png}
 \end{center}
 
-Nuestras pruebas confirmaron esta hipótesis: en promedio pudimos reducir el tiempo de ejecución en 30\%. Nuestra idea es que usar instrucciones como \texttt{pshufd} y \texttt{pblendw} es más eficientes porque combinan la copia y el acomodado de los pixeles a los bits específicos de los registros que necesitamos. Al mismo tiempo evitamos utilizar la parte lógica del CPU, yua que no utilizamos add sino blend para mezclar los registros.
+Nuestras pruebas confirmaron esta hipótesis: en promedio pudimos reducir el tiempo de ejecución en 30\%. Nuestra idea es que usar instrucciones como \texttt{pshufd} y \texttt{pblendw} es más eficientes porque combinan la copia y el acomodado de los pixeles a los bits específicos de los registros que necesitamos. Al mismo tiempo evitamos utilizar la parte lógica del CPU, ya que no utilizamos add sino blend para mezclar los registros, y suponemos que requiere menos tiempo de espera que una suma de números empaquetados.
