@@ -177,4 +177,12 @@ Esta vez vemos una leve mejora en el que es más ancho, 2975394 vs 2956806, el a
 
 \subsubsection*{Unrolling}
 
-En este experimento, nuevamente aplicamos la técnica de unrolling de ciclos, sobre el kernel, cuando estamos ciclando las filas, ya que nuestro kernel tiene una cantidad constantes de filas, y gracias a esto podemos aplicar esta técnica. Pero no como en el experimento que ya aplicamos esta técnica, tenemos la hipótesis de que la mejora será muy leve o nula, esto lo suponemos ya que el grueso del cómputo del filtro está en las pegadas a memoria, y en comparación a los saltos condicionales del ciclo estos ultimos  no son relevantes.
+En este experimento, nuevamente aplicamos la técnica de unrolling de ciclos, sobre el kernel, cuando estamos ciclando las filas, ya que nuestro kernel tiene una cantidad constantes de filas, y gracias a esto podemos aplicar esta técnica. Pero no como en el experimento que ya aplicamos esta técnica, tenemos la hipótesis de que la mejora será muy leve o nula, esto lo suponemos ya que el grueso del cómputo del filtro está en las pegadas a memoria, y en comparación a los saltos condicionales del ciclo estos últimos no son relevantes. Corrimos los mismos tests que en el analisis preliminar para la version original y la version con unrolling, ademas agregamos un tamaño de más de 5120x5120.
+
+\begin{center} 
+	\includegraphics[scale=0.5]{img/maxCloser_Unroll_compare.png}
+	\includegraphics[scale=0.5]{img/maxCloser_Unroll_small.png} %512x512
+	\includegraphics[scale=0.5]{img/maxCloser_Unroll_big.png} %5120x5120
+\end{center}
+
+Hay una mejora, pero en comparación a lo que tarda el algoritmo es muy poca, para la imagen de 512x512 ...TODO..., y y para la imagen de 5120x5120 hay una mejora del $5\%$, que no es mucho pero si estamos en una imagen muy grande o tenemos que optimizar mucho podria llegar a valer la pena.
