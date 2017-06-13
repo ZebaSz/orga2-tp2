@@ -1,33 +1,3 @@
-% Descripción
-% La propiedad lógica descripta sólo dice que la imagen resultante va a tener la misma cantidad de pixeles y el mismo ancho, pero no describe la imagen resultante en cuestión, no le veo mucho sentido.
-% [DONE] La imagen de la transformación está al revés
-% Implementación
-% La descripción de qué se hace con los punteros a los cuadrantes necesita una re-escritura.
-% El código presentado no es claro, qué tienen r10 y r11?
-% Análisis preliminar
-% No se explica cómo están hechos los experimentos.
-% Cómo hicieron el gráfico? Pusieron todos los datos sobre cada ejecución? El gráfico de esta manera puede dar una idea de la varianza, pero no se sabe bien qué tomaron para armar la recta.
-% Hipótesis de trabajo
-% [DONE] Las consignas, como "Conjunto de ideas de experimentos" indican qué debe ir (no necesariamente tienen que ser títulos).
-% [DONE] La comparación entre ASM y C entra dentro de los análisis preliminares.
-% Loop unrolling generalmente es aplicado cuando se tiene una cantidad fija de ciclos. Acá lo que hicieron fue hacer un solo unroll del loop, no?
-% Experimentación
-% La descripción del experimento que les parece interesante debería ir en un apartado "trabajos futuros". Ahí está un poco descolocado.
-% El párrafo que comienza con "El roll del cache en imágenes grandes" debería ser re-escrito, tiene varios errores.
-% La explicación de lo que se va a medir, debería ser concisa:
-% Queremos medir x cosa (el por qué debería estar claro en la hipótesis del trabajo) y cómo lo vamos a hacer.
-% Ejemplo (no es para que lo copien literal): Las mediciones se hicieron con tal mecanismo, en tal CPU, tomando la media de los resultados.
-% Como nos interesa saber cómo se comportan ambas modificaciones con diferentes tamaños de imágenes, en especial ver cómo se comporta con imágenes más grandes que la caché, utilizamos como entrada imágenes de tamaño x, y, z...
-% Para tener un análisis más granular de los tiempos de ejecución de los ciclos, medimos de x manera, con este CPU, z veces y tomamos la media.
-% Resultados obtenidos
-% [DONE] El número de la figura al comienzo dice 3 (es 4?)
-% El programa pesa más de lo normal? Si se refieren al espacio en memoria que ocupa el código, es muy poco.
-% Cuando hacen el análisis del ciclo, cómo lo hicieron? Si el ciclo del unroll es más largo, debería tardar más.
-% Sólo incluyan el porcentaje de diferencia, los tics no muestran mucho a simple vista. No queda claro de dónde salió ese 10%, del promedio con las imágenes de distintos tamaños?
-% [DONE] No tiene mucho sentido tener el tiempo de ejecución de C cuando no lo necesitan para su experimentación.
-% Conclusiones
-% [DONE] Las conclusiones deberían ser generales, al final del informe. El problema de ponerlas en cada filtro es que no pueden sacar conclusiones de todo el trabajo en cuestión.
-
 \section{Combinar}
 Este filtro consiste en cambiar la distribución de píxeles de una imagen tal que queden ordenados en cuatro cuadrantes diferentes. Se obtendrá mediante la aplicación de este filtro cuatro imágenes distintas de menor tamaño a la original, pero en donde los píxeles de la original se encuentran aun presentes en la imagen resultante.
 
@@ -117,12 +87,12 @@ La solución que fue planteada en c consiste en recorrer la matriz asociada a la
 \paragraph{Solución en ASM}
 En cuanto a la implementación en código assembler se tuvo que pensar una solución totalmente diferente ya que al tener que hacerlo con registros de 128 bits nuestra solución de agarrar los píxeles uno por uno y calcular su lugar correspondiente no seria posible. Se tomaron las siguientes decisiones de modelado Decisiones de modelado:
 \begin{itemize}
-\item Decidir con cuanta información a la vez íbamos a trabajar , se llego a la conclusión que lo mejor seria trabajar con 8 píxeles a la vez. Esta decisión se tomo puesto que eligiendo los 8 píxeles del lugar correcto podíamos llegar a armar 8 píxeles que iban a ser puestos en la imagen de salida. Esto nos debería dar un ahorro en la cantidad de veces que vamos a pegarle a memoria.
+\item Decidir con cuanta información a la vez íbamos a trabajar, se llego a la conclusión que lo mejor seria trabajar con 8 píxeles a la vez. Esta decisión se tomo puesto que eligiendo los 8 píxeles del lugar correcto podíamos llegar a armar 8 píxeles que iban a ser puestos en la imagen de salida. Esto nos debería dar un ahorro en la cantidad de veces que vamos a pegarle a memoria.
 \item Decidir entre la posibilidad de agarrar 16 píxeles que este en la misma fila o que estén la misma columna. Nos pareció lo mas fácil de implementar y lo mas efectivo a la hora de usar la cache era que tomáramos 8 píxeles contiguos. Se vera mas adelante en un experimento la diferencia entre ambos
-\item Ya que íbamos a tomar de a 8 píxeles contiguos pero el enunciado del trabajo practico solo aseguraba que la imagen a lo ancho iba a ser múltiplo de 4 , teníamos que hacer algo con respecto a los casos donde la imagen no era múltiplo de 8. En este caso tratamos de emular un poco la practica que realiza muchas veces el compilador de intel donde este separa el código en casos especiales para poder ahorrarse de preguntar en el medio del código . Por ende en nuestro código ASM solo preguntamos una vez si el ancho es múltiplo de 4 o de 8 y dependiendo de eso el código se disfurca en dos
+\item Ya que íbamos a tomar de a 8 píxeles contiguos pero el enunciado del trabajo practico solo aseguraba que la imagen a lo ancho iba a ser múltiplo de 4, teníamos que hacer algo con respecto a los casos donde la imagen no era múltiplo de 8. En este caso tratamos de emular un poco la practica que realiza muchas veces el compilador de intel donde este separa el código en casos especiales para poder ahorrarse de preguntar en el medio del código. Por ende en nuestro código ASM solo preguntamos una vez si el ancho es múltiplo de 4 o de 8 y dependiendo de eso el código se disfurca en dos
 \end{itemize}
 
-Ahora hablemos un poco mas de la iteración dentro del un ciclo de nuestro código ASM , podemos separar lo que hace dentro de una columna de lo que hace al cambiar de fila. Dentro de una columna nuestro objetivo es agarrar 8 píxeles desde el puntero $RDI$, agarrando primero cuatro y guardarlo en $XMM2, XMM4$ , moverse y agarrar cuatro mas y guardarlo en $XMM3, XMM5$ llámense $Pi$ con $1\leq i\leq 8$ y trabajarlos de forma tal que queden listos para ser pegados en la memoria de la imagen destino. El siguiente gráfico nos mostrara como ocurre la transformación de los 8 píxeles desde que son extraídos desde la imagen fuente hasta que están listos para ser puestos en la imagen destino : 
+Ahora hablemos un poco mas de la iteración dentro del un ciclo de nuestro código ASM, podemos separar lo que hace dentro de una columna de lo que hace al cambiar de fila. Dentro de una columna nuestro objetivo es agarrar 8 píxeles desde el puntero $RDI$, agarrando primero cuatro y guardarlo en $XMM2, XMM4$, moverse y agarrar cuatro mas y guardarlo en $XMM3, XMM5$ llámense $Pi$ con $1\leq i\leq 8$ y trabajarlos de forma tal que queden listos para ser pegados en la memoria de la imagen destino. El siguiente gráfico nos mostrara como ocurre la transformación de los 8 píxeles desde que son extraídos desde la imagen fuente hasta que están listos para ser puestos en la imagen destino : 
 
 \begin{center}
 	\begin{tikzpicture}
@@ -400,7 +370,7 @@ Cuando no se activa ninguna optimización, $h >> 1$ se calcula cada vez que se n
 
 
 \subsubsection*{Hipótesis 1: cargar 16 pixeles a la vez mejora la performance}
-Tratamos de llevar a cabo en este conjunto de experimentación la idea de Loop unrolling , con alguna pequeña modificación. Si vamos a lo que se entiende como Loop unrolling no lo podríamos aplicar a la solución presentada ya que este sirve para cuando existe una cantidad finita de iteraciones en realidad lo que se realizo fue el unroll de un ciclo logrando asi reducir la cantidad de ciclos a la mitad. Pasamos a procesar 16 pixeles a la vez pero distribuidos en dos filas , de esta manera solo habría que tener en cuenta que las filas sean múltiplos de 2 es decir pares para poder aplicar esta mejora al algoritmo.
+Tratamos de llevar a cabo en este conjunto de experimentación la idea de Loop unrolling, con alguna pequeña modificación. Si vamos a lo que se entiende como Loop unrolling no lo podríamos aplicar a la solución presentada ya que este sirve para cuando existe una cantidad finita de iteraciones en realidad lo que se realizo fue el unroll de un ciclo logrando asi reducir la cantidad de ciclos a la mitad. Pasamos a procesar 16 pixeles a la vez pero distribuidos en dos filas, de esta manera solo habría que tener en cuenta que las filas sean múltiplos de 2 es decir pares para poder aplicar esta mejora al algoritmo.
 
 A la hora de ver que tipo de experimentos hacíamos evaluamos dos aspectos:
 \begin{itemize}
@@ -429,9 +399,9 @@ A la hora de ver que tipo de experimentos hacíamos evaluamos dos aspectos:
 	\label{fourCombine_ticksciclo}
 \end{figure}
 
-Podemos distinguir de la figura~\ref{fourCombine_unroolvsnormal} que hay una mejora a medida que la imagen se va haciendo cada vez mas grande en el algoritmo de desarrollo del ciclo, esto nos estaría indicando a simple vista que el método funciona, podríamos tener alguna desventaja ya que nuestro programa estaría pesando mas de lo normal, pero esto no sería algo que tenga importancia en un programa como el desarrollado. También se puede hablar de la comparación en imágenes chicas viendo la figura~\ref{fourCombine_unroolvsnormal_asmOnly} . En este caso se trabajo con los resultados mas chicos del set de resultados para poder ver que tan distintos o iguales eran los algoritmos y se puede notar que en imágenes chicas no hay casi diferencia de performance, esto tiene sentido pensando que en imágenes chicas no existe una cantidad de saltos que pueda llegar a influir en la predicción de saltos del procesador.
+Podemos distinguir de la figura~\ref{fourCombine_unroolvsnormal} que hay una mejora a medida que la imagen se va haciendo cada vez mas grande en el algoritmo de desarrollo del ciclo, esto nos estaría indicando a simple vista que el método funciona, podríamos tener alguna desventaja ya que nuestro programa estaría pesando mas de lo normal, pero esto no sería algo que tenga importancia en un programa como el desarrollado. También se puede hablar de la comparación en imágenes chicas viendo la figura~\ref{fourCombine_unroolvsnormal_asmOnly}. En este caso se trabajo con los resultados mas chicos del set de resultados para poder ver que tan distintos o iguales eran los algoritmos y se puede notar que en imágenes chicas no hay casi diferencia de performance, esto tiene sentido pensando que en imágenes chicas no existe una cantidad de saltos que pueda llegar a influir en la predicción de saltos del procesador.
 
-Por ultimo en la figura~\ref{fourCombine_ticksciclo} una manera interesante de ver la diferencia de la performance que se nos ocurrió fue la de medir un ciclo de cada algoritmo y dividirlo por la cantidad de pixeles que procesan en ese ciclo y asi ver que tan performante era cada uno luego de hacer la modificación a esto como se indica en la sección de "como y que van a medir" se puede observar otra manera como la implementación de UNROLL lograr obtener un tiempo que es al menos dos veces mejor que el método puesto en nuestro TP. Este resultado parece contradecir los anteriores dos ya que en estos no se observa que los resultados del UNROLL sean dos veces mejores. No fue testeado pero mi hipótesis recae a que el trabajo que se debe hacer cada vez que se cambia de fila es mayor cuando estamos haciendo el UNROLL , tal vez por la misma ineficiencia de la implementación. Pero este resultado nos muestra el potencial que tiene el UNROLL al poder tener un mejor tiempo de procesamiento por píxel.
+Por ultimo en la figura~\ref{fourCombine_ticksciclo} una manera interesante de ver la diferencia de la performance que se nos ocurrió fue la de medir un ciclo de cada algoritmo y dividirlo por la cantidad de pixeles que procesan en ese ciclo y asi ver que tan performante era cada uno luego de hacer la modificación a esto como se indica en la sección de ``como y que van a medir'' se puede observar otra manera como la implementación de UNROLL lograr obtener un tiempo que es al menos dos veces mejor que el método puesto en nuestro TP. Este resultado parece contradecir los anteriores dos ya que en estos no se observa que los resultados del UNROLL sean dos veces mejores. No fue testeado pero mi hipótesis recae a que el trabajo que se debe hacer cada vez que se cambia de fila es mayor cuando estamos haciendo el UNROLL, tal vez por la misma ineficiencia de la implementación. Pero este resultado nos muestra el potencial que tiene el UNROLL al poder tener un mejor tiempo de procesamiento por píxel.
 
 
 \subsubsection*{Hipótesis 2: usar registro AVX mejora la performance}
