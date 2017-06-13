@@ -29,14 +29,7 @@
 % [DONE] Las conclusiones deberían ser generales, al final del informe. El problema de ponerlas en cada filtro es que no pueden sacar conclusiones de todo el trabajo en cuestión.
 
 \section{Combinar}
-Este filtro consiste en cambiar la distribución de píxeles de una imagen tal que queden ordenados en cuatro cuadrantes diferentes. Se obtendrá mediante la aplicación de este filtro cuatro imágenes distintas de menor tamaño a la original, pero en donde los píxeles de la original se encuentran aun presentes en la imagen resultante. Es decir: 
-\begin{center}
-	$\forall$ $pixel,$ $cantidadPixeles(pixel, imagenOriginal) == cantidadPixeles(pixel,imagenResultante)$
-	$\wedge$ $imagenOriginal.length == imagenResultante.length$
-\end{center}
-\begin{flushright}
-	$pixel \in imagenOriginal$
-\end{flushright}
+Este filtro consiste en cambiar la distribución de píxeles de una imagen tal que queden ordenados en cuatro cuadrantes diferentes. Se obtendrá mediante la aplicación de este filtro cuatro imágenes distintas de menor tamaño a la original, pero en donde los píxeles de la original se encuentran aun presentes en la imagen resultante.
 
 El resultado visual que provoca la aplicación de este filtro es la sensación de que la imagen se dividió en cuatro pequeñas imágenes cuando verdaderamente ninguna de ella es igual a la otra. 
 Se puede ver en el ejemplo de la figura~\ref{fourCombine_transform} como es la distribución que va teniendo la aplicación de nuestro filtro allí podemos distinguir que los píxeles antes y luego de la aplicación del filtro son los mismos.
@@ -49,22 +42,25 @@ Se puede ver en el ejemplo de la figura~\ref{fourCombine_transform} como es la d
 		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
 		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-		\node[box, fill=red] at (-1.5,+1.50) {P16};
-		\node[box, fill=red] at (-0.50,+1.50) {P15};
-		\node[box, fill=orange] at (+0.50,+1.50) {P14};
-		\node[box, fill=orange] at (+1.5,+1.50) {P13};
-		\node[box, fill=red] at (-1.5,+0.50) {P12};
-		\node[box, fill=red] at (-0.50,+0.50) {P11};
-		\node[box, fill=orange] at (+0.50,+0.50) {P10};
-		\node[box, fill=orange] at (+1.50,+0.50) {P09};
-		\node[box, fill=yellow] at (-1.50,-0.50) {P08};
-		\node[box, fill=yellow] at (-0.50,-0.50) {P07};
-		\node[box] at (+0.50,-0.50) {P06};
-		\node[box] at (+1.50,-0.50) {P05};
-		\node[box, fill=yellow] at (-1.50,-1.50) {P04};
-		\node[box, fill=yellow] at (-0.50,-1.50) {P03};
-		\node[box] at (+0.50,-1.50) {P02};
-		\node[box] at (+1.50,-1.50) {P01};
+		\node[box, fill=red] at (-1.5,+1.50) {P01};
+		\node[box, fill=orange] at (-0.50,+1.50) {P02};
+		\node[box, fill=red] at (+0.50,+1.50) {P03};
+		\node[box, fill=orange] at (+1.5,+1.50) {P04};
+
+		\node[box, fill=gray] at (-1.5,+0.50) {P05};
+		\node[box, fill=yellow] at (-0.50,+0.50) {P06};
+		\node[box, fill=gray] at (+0.50,+0.50) {P07};
+		\node[box, fill=yellow] at (+1.50,+0.50) {P08};
+
+		\node[box, fill=red] at (-1.50,-0.50) {P09};
+		\node[box, fill=orange] at (-0.50,-0.50) {P10};
+		\node[box, fill=red] at (+0.50,-0.50) {P11};
+		\node[box, fill=orange] at (+1.50,-0.50) {P12};
+
+		\node[box, fill=gray] at (-1.50,-1.50) {P13};
+		\node[box, fill=yellow] at (-0.50,-1.50) {P14};
+		\node[box, fill=gray] at (+0.50,-1.50) {P15};
+		\node[box, fill=yellow] at (+1.50,-1.50) {P16};
 		\end{tikzpicture}
 	\end{subfigure}
 	{\LARGE$\xrightarrow{FourCombine}$}
@@ -75,25 +71,25 @@ Se puede ver en el ejemplo de la figura~\ref{fourCombine_transform} como es la d
 		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
 		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-		\node[box, fill=red] at (-1.5,+1.50) {P16};
-		\node[box, fill=orange] at (-0.50,+1.50) {P14};
-		\node[box, fill=red] at (+0.50,+1.50) {P15};
-		\node[box, fill=orange] at (+1.5,+1.50) {P13};
+		\node[box, fill=red] at (-1.5,+1.50) {P01};
+		\node[box, fill=red] at (-0.50,+1.50) {P03};
+		\node[box, fill=orange] at (+0.50,+1.50) {P02};
+		\node[box, fill=orange] at (+1.5,+1.50) {P04};
 
-		\node[box, fill=yellow] at (-1.5,+0.50) {P08};
-		\node[box] at (-0.50,+0.50) {P06};
-		\node[box, fill=yellow] at (+0.50,+0.50) {P07};
-		\node[box] at (+1.50,+0.50) {P05};
+		\node[box, fill=red] at (-1.5,+0.50) {P09};
+		\node[box, fill=red] at (-0.50,+0.50) {P11};
+		\node[box, fill=orange] at (+0.50,+0.50) {P10};
+		\node[box, fill=orange] at (+1.50,+0.50) {P12};
 
-		\node[box, fill=red] at (-1.50,-0.50) {P12};
-		\node[box, fill=orange] at (-0.50,-0.50) {P10};
-		\node[box, fill=red] at (+0.50,-0.50) {P11};
-		\node[box, fill=orange] at (+1.50,-0.50) {P09};
+		\node[box, fill=gray] at (-1.50,-0.50) {P05};
+		\node[box, fill=gray] at (-0.50,-0.50) {P07};
+		\node[box, fill=yellow] at (+0.50,-0.50) {P06};
+		\node[box, fill=yellow] at (+1.50,-0.50) {P08};
 
-		\node[box, fill=yellow] at (-1.50,-1.50) {P04};
-		\node[box] at (-0.50,-1.50) {P02};
-		\node[box, fill=yellow] at (+0.50,-1.50) {P03};
-		\node[box] at (+1.50,-1.50) {P01};
+		\node[box, fill=gray] at (-1.50,-1.50) {P13};
+		\node[box, fill=gray] at (-0.50,-1.50) {P15};
+		\node[box, fill=yellow] at (+0.50,-1.50) {P14};
+		\node[box, fill=yellow] at (+1.50,-1.50) {P16};
 
 		\end{tikzpicture}
 	\end{subfigure}
@@ -284,15 +280,82 @@ Hago shuffle
 	\end{tikzpicture}
 \end{center}
 
+Una vez que tenemos los 8 píxeles ordenados según los quiero procedo a guardarlos en la posiciones de memoria a las que apuntan el registro $R8$ y $R9$ sin preocuparme en este caso del cuadrante donde estos dos están apuntando. Ya que podrian estar apuntando a un lugar del cuadrante 1, 2 o bien podria ser 3, 4. Pasare a mostrar que ocurre con los registros R8, R9, R10, R11 durante el primer ciclo de columna y luego de haber cambiado de fila. 
 
-Una vez que tenemos los 8 píxeles ordenados según los quiero procedo a guardarlos en la posiciones de memoria a las que apuntan el registro $R8$ y $R9$ sin preocuparme en este caso del cuadrante donde estos dos están apuntando.
+Aqui una imagen intentado mostrar el cambio de estado de los registros : 
 
-En cuando a que pasa cuando la iteración sobre la columna se termina y se pasa a una nueva columna lo vamos a explicar a continuación:
-Primero movemos $R8$ y $R9$ hacia su próxima fila recordando que la próxima fila sea cual sea el cuadrante donde se encuentro se realiza sumándole una fila a cada uno.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.27\textwidth}
+		\centering
+		\begin{tikzpicture}
+		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+		\node[box, fill=red] at (-1.5,+1.50) {R8};
+		\node[box] at (-0.50,+1.50) {};
+		\node[box, fill=orange] at (+0.50,+1.50) {R9};
+		\node[box] at (+1.5,+1.50) {};
+		\node[box] at (-1.5,+0.50) {};
+		\node[box] at (-0.50,+0.50) {};
+		\node[box] at (+0.50,+0.50) {};
+		\node[box] at (+1.50,+0.50) {};
+		\node[box, fill=yellow] at (-1.50,-0.50) {R10};
+		\node[box] at (-0.50,-0.50) {};
+		\node[box] at (+0.50,-0.50) {R11};
+		\node[box] at (+1.50,-0.50) {};
+		\node[box] at (-1.50,-1.50) {};
+		\node[box] at (-0.50,-1.50) {};
+		\node[box] at (+0.50,-1.50) {};
+		\node[box] at (+1.50,-1.50) {};
+		\end{tikzpicture}
+	\end{subfigure}
+	{\LARGE$\xrightarrow{Luego de Ciclo Columna}$}
+	\begin{subfigure}[b]{0.27\textwidth}
+		\centering
+		\begin{tikzpicture}
+		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+		\node[box] at (-1.5,+1.50) {};
+		\node[box] at (-0.50,+1.50) {};
+		\node[box] at (+0.50,+1.50) {};
+		\node[box] at (+1.5,+1.50) {};
 
-El tema viene ahora en que hay que ir switcheando los cuadrantes donde voy insertando los píxeles resultantes cada uno fila. Siendo esta parte del código la que se encarga de swtichear $R8$ y $R9$ entre los distintos cuadrantes se utiliza para ello una variable puente para no sobrescribir ni pisar ningún valor. 
+		\node[box, fill=yellow] at (-1.5,+0.50) {R10};
+		\node[box] at (-0.50,+0.50) {};
+		\node[box] at (+0.50,+0.50) {R11};
+		\node[box] at (+1.50,+0.50) {};
 
-Snippet del código :
+		\node[box, fill=red] at (-1.50,-0.50) {R08};
+		\node[box] at (-0.50,-0.50) {};
+		\node[box, fill=orange] at (+0.50,-0.50) {R09};
+		\node[box] at (+1.50,-0.50) {};
+
+		\node[box] at (-1.50,-1.50) {};
+		\node[box] at (-0.50,-1.50) {};
+		\node[box] at (+0.50,-1.50) {};
+		\node[box] at (+1.50,-1.50) {};
+
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{Lugar que ocupan los registros $R8,R9,R10,R11$ antes y luego del cambio de fila}
+	\label{fourCombine_rowchange}
+\end{figure}
+
+En cuando a que pasa cuando la iteración sobre la columna se termina y se pasa a una nueva fila se realizan lo siguiente :
+\begin{itemize}
+
+\item El R8 toma el valor de R9
+
+\item El valor de R9 se el valor de la mitad de una fila 
+
+\item Se switchea R8 R9 por R10 R11 reespectivamente
+\end{itemize}
+
+Snippet del código del switch:
 
 \begin{lstlisting}
 	mov rax, r8
@@ -303,7 +366,7 @@ Snippet del código :
 	mov r11, rax
 \end{lstlisting}
 
-Lo único que cambia de esta explicación con respecto a cuando el ancho no es multiplico de 8 es en este punto donde tenemos que cambiar de fila, ya que nos quedaron 4 píxeles sin procesar y como seria demasiado trabajoso holdearlos para poder trabajarlos en otra iteración posterior, lo mejor que nos ocurrió fue trabajarlos manualmente e insertarlos en el lugar donde les corresponde. Luego de esto se sigue con el paso recién explicado.
+Lo único que cambia de esta explicación con respecto a cuando el ancho no es multiplo de 8 es en este punto donde tenemos que cambiar de fila, ya que nos quedaron 4 píxeles sin procesar y como seria demasiado trabajoso holdearlos para poder trabajarlos en otra iteración posterior, lo mejor que nos ocurrió fue trabajarlos manualmente e insertarlos en el lugar donde les corresponde. Luego de esto se sigue con el paso recién explicado.
 
 
 \subsection{Análisis preliminar}
@@ -333,30 +396,18 @@ Una linea en particular que nos llamó la atención fue la siguiente
 
 Cuando no se activa ninguna optimización, $h >> 1$ se calcula cada vez que se necesita, en cada iteración del ciclo. En cambio, al activar las optimizaciones, ese valor se calcula y almacena antes de comenzar el ciclo. Existen otras mejoras pero el nivel del código no nos permitió apreciar grandes diferencias.
 
-\subsection{Hipótesis de trabajo}
+\subsection{Experimentación}
 
-Una de las primeras ideas a la hora de experimentar con nuestra implementación de ASM es poder correrla en contra de la de implementación que se realizo en C , teniendo en cuenta que en el caso de este filtro juega mas el echo de guardar en memoria los datos que de procesarlos.
 
-También tratamos de llevar a cabo en este conjunto de experimentación la idea de Loop unrolling , con alguna pequeña modificación. Si vamos a lo que se entiende como Loop unrolling y lo aplicamos al algoritmo de ASM lo que lograríamos seria leer de a 16 píxeles a lo largo a la vez en de a 8 píxeles logrando así una reducción en los saltos del loop de columna. Pero esta implementación nos llevaría a tener que abrir mas los casos en los cuales anteriormente tratábamos ahora tendríamos imágenes que deberían ser congruentes a 0 modulo 16 para poder ir por el camino del unrolling pero caso contrario es decir ser congruente 4, 8 , 12 deberían tratarse en otra parte del programa y así solo logrando un incremento en la performance para 0.25 de los casos. Para poder solventar este pequeño numero de casos donde el unrolling podría ser efectivo se decidió procesar 16 píxeles a la vez pero distribuidos en dos filas , de esta manera solo habría que tener en cuenta que las filas sean múltiplos de 2 es decir pares para poder aplicar esta mejora al algoritmo.
+\subsubsection*{Hipótesis 1: cargar 16 pixeles a la vez mejora la performance}
+Tratamos de llevar a cabo en este conjunto de experimentación la idea de Loop unrolling , con alguna pequeña modificación. Si vamos a lo que se entiende como Loop unrolling no lo podríamos aplicar a la solución presentada ya que este sirve para cuando existe una cantidad finita de iteraciones en realidad lo que se realizo fue el unroll de un ciclo logrando asi reducir la cantidad de ciclos a la mitad. Pasamos a procesar 16 pixeles a la vez pero distribuidos en dos filas , de esta manera solo habría que tener en cuenta que las filas sean múltiplos de 2 es decir pares para poder aplicar esta mejora al algoritmo.
 
-Otra idea que había surgido para probar en un experimento fue la de usar registros mas grandes (AVX) para poder lograr así una reducción a la hora de mezclar los elementos, se había pensado que teniendo muchos mas píxeles juntos iba a resultar mas fácil poder ordenarlos para su posterior puesta en en memoria. El problema con este experimento fue que encontramos que las instrucciones AVX (que funcionan en 256 bits) lo único que hacen es replicar comportamientos en la parte baja y la alta del registro es decir los trata como dos registros de 128 bits que solo logran comportamientos de este tipo de registro. Desistimos de hacer este experimento por no encontrar las instrucciones necesarias para poder realizar un código mas performante que el propuesto como solución.
+A la hora de ver que tipo de experimentos hacíamos evaluamos dos aspectos:
+\begin{itemize}
+\item Ver bien de cerca que es lo que pasa con nuestras dos implementaciones porque si tomamos las medidas en una escala muy chica vamos a perder información sobre que lo que esta pasando. 
 
-Buscamos mediante distintos sistemas de medidas mostrar que desenrollar el loop aumenta la performance de nuestro algoritmo ya que el sistema de predicción debería predecir menos saltos.
-
-\subsection{Diseño experimental}
-
-Queremos ver bien de cerca que es lo que pasa con nuestras dos implementaciones porque si tomamos las medidas en una escala muy chica vamos a perder información sobre que lo que esta pasando. 
-
-También nos gustaría saber cual es el tiempo que se demoran ambos algoritmos en desarrollar un ciclo. Sabemos que la diferencia esta en que ambos resuelven diferente cantidad de  píxeles a la vez, por ende el tiempo que demoren en resolver un ciclo va a estar dividido por la cantidad de elementos que trabaja a la vez. Vamos a poner también en la misma linea el tiempo de un ciclo del algoritmo de c que solo procesa un píxel a la vez.
-
-Un experimento interesante que debería estar incluido en el tp sería poder medir que porcentaje de un ciclo del algoritmo presentado como respuesta se utiliza cargando datos, que porcentaje en procesarlos y que porcentaje en cargarlos nuevamente a memoria, tenemos la impresión que la gran mayoría del tiempo se la pasa cargando y poniendo cosas en memoria por ende si quisiéramos mejorar aun mas nuestro algoritmo podríamos solamente trabajar sobre el porcentaje de procesamiento de los datos. Estaríamos en presencia de un cuello de botella representado por la memoria.
-
-El roll del cache en imágenes grandes aquí vamos a probar cual es la diferencia entre la implementación presentada como respuesta al trabajo practico y la implementación del unrolling. Aunque anteriormente vimos que en ejemplos chicos la implementación del unrolling era mejor, en el caso de imágenes obscenamente grandes (mayores a la capacidad del cache) esto no ocurre en imágenes grandes.
-
-En el único momento que vamos a utilizar datos por fuera de la cátedra va a ser al momento de querer ver el funcionamiento de la cache en nuestro algoritmo, en este caso utilizamos una imagen que excede la cache de nuestra CPU , la imagen pesa 200mb y por obvios motivos no va a ser adjuntada junto al tp.
-
-\subsection{Resultados y Análisis}
-
+\item También nos gustaría saber cual es el tiempo que se demoran ambos algoritmos en desarrollar un ciclo. Sabemos que la diferencia esta en que ambos resuelven diferente cantidad de  píxeles a la vez, por ende el tiempo que demoren en resolver un ciclo va a estar dividido por la cantidad de elementos que trabaja a la vez. Vamos a poner también en la misma linea el tiempo de un ciclo del algoritmo de c que solo procesa un píxel a la vez.
+\end{itemize}
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.5]{img/fourCombine_UnrollvsNormal.png}
@@ -382,7 +433,31 @@ Podemos distinguir de la figura~\ref{fourCombine_unroolvsnormal} que hay una mej
 
 Por ultimo en la figura~\ref{fourCombine_ticksciclo} una manera interesante de ver la diferencia de la performance que se nos ocurrió fue la de medir un ciclo de cada algoritmo y dividirlo por la cantidad de pixeles que procesan en ese ciclo y asi ver que tan performante era cada uno luego de hacer la modificación a esto como se indica en la sección de "como y que van a medir" se puede observar otra manera como la implementación de UNROLL lograr obtener un tiempo que es al menos dos veces mejor que el método puesto en nuestro TP. Este resultado parece contradecir los anteriores dos ya que en estos no se observa que los resultados del UNROLL sean dos veces mejores. No fue testeado pero mi hipótesis recae a que el trabajo que se debe hacer cada vez que se cambia de fila es mayor cuando estamos haciendo el UNROLL , tal vez por la misma ineficiencia de la implementación. Pero este resultado nos muestra el potencial que tiene el UNROLL al poder tener un mejor tiempo de procesamiento por píxel.
 
-Por ultimo voy a hablar de mi test sobre la cache sobre el cual solo quedan los resultados y no hay gráfico asociado . Temo que la  hipótesis que teníamos no se pudo probar ya que al poner en perspectiva los mejores tiempo tanto para el código ASM original como para el ASM - UNROLL el resulto mostro una mejora de al menos $10\%$, cuando se esperaba que al poder leer por filas en nuestro ASM original se podría conseguir una hit rate mas grande. 
+
+\subsubsection*{Hipótesis 2: usar registro AVX mejora la performance}
+Otra idea que había surgido para probar en un experimento fue la de usar registros mas grandes (AVX) para poder lograr así una reducción a la hora de mezclar los elementos, se había pensado que teniendo muchos mas píxeles juntos iba a resultar mas fácil poder ordenarlos para su posterior puesta en en memoria. El problema con este experimento fue que encontramos que las instrucciones AVX (que funcionan en 256 bits) lo único que hacen es replicar comportamientos en la parte baja y la alta del registro es decir los trata como dos registros de 128 bits que solo logran comportamientos de este tipo de registro. Desistimos de hacer este experimento por no encontrar las instrucciones necesarias para poder realizar un código mas performante que el propuesto como solución.
+
+\subsubsection*{Hipótesis 3: el código presentado hace buen uso de la memoria cache}
+Nos propusimos ademas cambiar el código para lograr así demostrar que nuestro algoritmo presentado al leer fila por fila logra una mejora en cuando a la administración de la memoria cache. 
+
+Los cambios en el código para lograr esto fueron:
+\begin{itemize}
+\item En vez de procesar los pixeles fila por fila lo hicimos columna por columna. De esta forma esperamos que en imágenes grande la cantidad de misses en la memoria cache 
+
+\item Procesar la misma cantidad de pixeles por ciclo en ambas soluciones. Asi podemos evitar dudar de los resultados y pensar en la mejora de uno por sobre la otra por la cantidad de pixeles que esta procesando.
+
+\item Hay un incremento en la cantidad de veces que se pide a la memoria información ya que cada vez que procesamos una columna queremos volver a un estado donde mis punteros estén al principio. Esto puede ayudar a que en casos donde la imagen en su totalidad entra en la cache, se mejore la performance. 
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{img/fourCombine_antiCache.png}
+	\caption{Procesar por filas de la imagen en contra de procesar en columnas}
+	\label{fourCombine_antiCache}
+\end{figure}
+
+Aunque quisimos encontrar una mejor manera de poder mostrar lo resultados, espero se pueda apreciar que hasta cierto tamaño de imagen en nuestro caso especifico probamos que en una imagen de tamaño menor a  $128x128p$ la cache no cumple ningun roll y nuestros resultados se parecen bastante. En cambio en imágenes donde la cantidad de pixeles es superior a esta la cache empieza tomar un roll mas importante y se empieza a notar como el algoritmo que presentamos es mucho mas eficiente que el usamos para nuestra experimentación.
 
 \subsection{Trabajos Futuros}
 Un experimento interesante que debería estar incluido en el tp sería poder medir que porcentaje de un ciclo del algoritmo presentado como respuesta se utiliza cargando datos, que porcentaje en procesarlos y que porcentaje en cargarlos nuevamente a memoria, tenemos la impresión que la gran mayoría del tiempo se la pasa cargando y poniendo cosas en memoria por ende si quisiéramos mejorar aun mas nuestro algoritmo podríamos solamente trabajar sobre el porcentaje de procesamiento de los datos. Estaríamos en presencia de un cuello de botella representado por la memoria.
+
+Algo interesante para poder medir mejor la diferencia entre las implementaciones y su función con el cache podría ser medir la cantidad de miss/hits que tienen cada una de las implementaciones asi ver en medidas mas tangibles como funciona cada uno de ellos.
