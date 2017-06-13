@@ -225,4 +225,12 @@ Por otro lado, podemos ver que efectivamente, incluso con las optimizaciones de 
 
 \subsection{Experimentación}
 
-TODO POR FAVOR HAGANME
+Como se mencionó en la sección de implementación, nosotros utilizamos \texttt{mov}s, shifts y \texttt{add}s para acomodar los pixeles y realizar los promedios entre los pixeles. Sin embargo, existen instrucciones específicamente pensadas para estas tareas: los shuffles y los blends.
+
+Con esto en mente, decidimos modificar nuestro filtro para que utilice dichas instrucciones:
+
+\begin{center}
+  \includegraphics[scale=0.5]{img/linearZoom_shuf_bars.png}
+\end{center}
+
+Nuestras pruebas confirmaron esta hipótesis: en promedio pudimos reducir el tiempo de ejecución en 30\%. Nuestra idea es que usar instrucciones como \texttt{pshufd} y \texttt{pblendw} es más eficientes porque combinan la copia y el acomodado de los pixeles a los bits específicos de los registros que necesitamos. Al mismo tiempo evitamos utilizar la parte lógica del CPU, yua que no utilizamos add sino blend para mezclar los registros.
