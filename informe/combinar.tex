@@ -29,14 +29,7 @@
 % [DONE] Las conclusiones deberían ser generales, al final del informe. El problema de ponerlas en cada filtro es que no pueden sacar conclusiones de todo el trabajo en cuestión.
 
 \section{Combinar}
-Este filtro consiste en cambiar la distribución de píxeles de una imagen tal que queden ordenados en cuatro cuadrantes diferentes. Se obtendrá mediante la aplicación de este filtro cuatro imágenes distintas de menor tamaño a la original, pero en donde los píxeles de la original se encuentran aun presentes en la imagen resultante. Es decir: 
-\begin{center}
-	$\forall$ $pixel,$ $cantidadPixeles(pixel, imagenOriginal) == cantidadPixeles(pixel,imagenResultante)$
-	$\wedge$ $imagenOriginal.length == imagenResultante.length$
-\end{center}
-\begin{flushright}
-	$pixel \in imagenOriginal$
-\end{flushright}
+Este filtro consiste en cambiar la distribución de píxeles de una imagen tal que queden ordenados en cuatro cuadrantes diferentes. Se obtendrá mediante la aplicación de este filtro cuatro imágenes distintas de menor tamaño a la original, pero en donde los píxeles de la original se encuentran aun presentes en la imagen resultante.
 
 El resultado visual que provoca la aplicación de este filtro es la sensación de que la imagen se dividió en cuatro pequeñas imágenes cuando verdaderamente ninguna de ella es igual a la otra. 
 Se puede ver en el ejemplo de la figura~\ref{fourCombine_transform} como es la distribución que va teniendo la aplicación de nuestro filtro allí podemos distinguir que los píxeles antes y luego de la aplicación del filtro son los mismos.
@@ -49,22 +42,25 @@ Se puede ver en el ejemplo de la figura~\ref{fourCombine_transform} como es la d
 		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
 		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-		\node[box, fill=red] at (-1.5,+1.50) {P16};
-		\node[box, fill=red] at (-0.50,+1.50) {P15};
-		\node[box, fill=orange] at (+0.50,+1.50) {P14};
-		\node[box, fill=orange] at (+1.5,+1.50) {P13};
-		\node[box, fill=red] at (-1.5,+0.50) {P12};
-		\node[box, fill=red] at (-0.50,+0.50) {P11};
-		\node[box, fill=orange] at (+0.50,+0.50) {P10};
-		\node[box, fill=orange] at (+1.50,+0.50) {P09};
-		\node[box, fill=yellow] at (-1.50,-0.50) {P08};
-		\node[box, fill=yellow] at (-0.50,-0.50) {P07};
-		\node[box] at (+0.50,-0.50) {P06};
-		\node[box] at (+1.50,-0.50) {P05};
-		\node[box, fill=yellow] at (-1.50,-1.50) {P04};
-		\node[box, fill=yellow] at (-0.50,-1.50) {P03};
-		\node[box] at (+0.50,-1.50) {P02};
-		\node[box] at (+1.50,-1.50) {P01};
+		\node[box, fill=red] at (-1.5,+1.50) {P01};
+		\node[box, fill=orange] at (-0.50,+1.50) {P02};
+		\node[box, fill=red] at (+0.50,+1.50) {P03};
+		\node[box, fill=orange] at (+1.5,+1.50) {P04};
+
+		\node[box, fill=gray] at (-1.5,+0.50) {P05};
+		\node[box, fill=yellow] at (-0.50,+0.50) {P06};
+		\node[box, fill=gray] at (+0.50,+0.50) {P07};
+		\node[box, fill=yellow] at (+1.50,+0.50) {P08};
+
+		\node[box, fill=red] at (-1.50,-0.50) {P09};
+		\node[box, fill=orange] at (-0.50,-0.50) {P10};
+		\node[box, fill=red] at (+0.50,-0.50) {P11};
+		\node[box, fill=orange] at (+1.50,-0.50) {P12};
+
+		\node[box, fill=gray] at (-1.50,-1.50) {P13};
+		\node[box, fill=yellow] at (-0.50,-1.50) {P14};
+		\node[box, fill=gray] at (+0.50,-1.50) {P15};
+		\node[box, fill=yellow] at (+1.50,-1.50) {P16};
 		\end{tikzpicture}
 	\end{subfigure}
 	{\LARGE$\xrightarrow{FourCombine}$}
@@ -75,25 +71,25 @@ Se puede ver en el ejemplo de la figura~\ref{fourCombine_transform} como es la d
 		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
 		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
-		\node[box, fill=red] at (-1.5,+1.50) {P16};
-		\node[box, fill=orange] at (-0.50,+1.50) {P14};
-		\node[box, fill=red] at (+0.50,+1.50) {P15};
-		\node[box, fill=orange] at (+1.5,+1.50) {P13};
+		\node[box, fill=red] at (-1.5,+1.50) {P01};
+		\node[box, fill=red] at (-0.50,+1.50) {P03};
+		\node[box, fill=orange] at (+0.50,+1.50) {P02};
+		\node[box, fill=orange] at (+1.5,+1.50) {P04};
 
-		\node[box, fill=yellow] at (-1.5,+0.50) {P08};
-		\node[box] at (-0.50,+0.50) {P06};
-		\node[box, fill=yellow] at (+0.50,+0.50) {P07};
-		\node[box] at (+1.50,+0.50) {P05};
+		\node[box, fill=red] at (-1.5,+0.50) {P09};
+		\node[box, fill=red] at (-0.50,+0.50) {P11};
+		\node[box, fill=orange] at (+0.50,+0.50) {P10};
+		\node[box, fill=orange] at (+1.50,+0.50) {P12};
 
-		\node[box, fill=red] at (-1.50,-0.50) {P12};
-		\node[box, fill=orange] at (-0.50,-0.50) {P10};
-		\node[box, fill=red] at (+0.50,-0.50) {P11};
-		\node[box, fill=orange] at (+1.50,-0.50) {P09};
+		\node[box, fill=gray] at (-1.50,-0.50) {P05};
+		\node[box, fill=gray] at (-0.50,-0.50) {P07};
+		\node[box, fill=yellow] at (+0.50,-0.50) {P06};
+		\node[box, fill=yellow] at (+1.50,-0.50) {P08};
 
-		\node[box, fill=yellow] at (-1.50,-1.50) {P04};
-		\node[box] at (-0.50,-1.50) {P02};
-		\node[box, fill=yellow] at (+0.50,-1.50) {P03};
-		\node[box] at (+1.50,-1.50) {P01};
+		\node[box, fill=gray] at (-1.50,-1.50) {P13};
+		\node[box, fill=gray] at (-0.50,-1.50) {P15};
+		\node[box, fill=yellow] at (+0.50,-1.50) {P14};
+		\node[box, fill=yellow] at (+1.50,-1.50) {P16};
 
 		\end{tikzpicture}
 	\end{subfigure}
@@ -284,15 +280,82 @@ Hago shuffle
 	\end{tikzpicture}
 \end{center}
 
+Una vez que tenemos los 8 píxeles ordenados según los quiero procedo a guardarlos en la posiciones de memoria a las que apuntan el registro $R8$ y $R9$ sin preocuparme en este caso del cuadrante donde estos dos están apuntando. Ya que podrian estar apuntando a un lugar del cuadrante 1, 2 o bien podria ser 3, 4. Pasare a mostrar que ocurre con los registros R8, R9, R10, R11 durante el primer ciclo de columna y luego de haber cambiado de fila. 
 
-Una vez que tenemos los 8 píxeles ordenados según los quiero procedo a guardarlos en la posiciones de memoria a las que apuntan el registro $R8$ y $R9$ sin preocuparme en este caso del cuadrante donde estos dos están apuntando.
+Aqui una imagen intentado mostrar el cambio de estado de los registros : 
 
-En cuando a que pasa cuando la iteración sobre la columna se termina y se pasa a una nueva columna lo vamos a explicar a continuación:
-Primero movemos $R8$ y $R9$ hacia su próxima fila recordando que la próxima fila sea cual sea el cuadrante donde se encuentro se realiza sumándole una fila a cada uno.
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.27\textwidth}
+		\centering
+		\begin{tikzpicture}
+		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+		\node[box, fill=red] at (-1.5,+1.50) {R8};
+		\node[box] at (-0.50,+1.50) {};
+		\node[box, fill=orange] at (+0.50,+1.50) {R9};
+		\node[box] at (+1.5,+1.50) {};
+		\node[box] at (-1.5,+0.50) {};
+		\node[box] at (-0.50,+0.50) {};
+		\node[box] at (+0.50,+0.50) {};
+		\node[box] at (+1.50,+0.50) {};
+		\node[box, fill=yellow] at (-1.50,-0.50) {R10};
+		\node[box] at (-0.50,-0.50) {};
+		\node[box] at (+0.50,-0.50) {R11};
+		\node[box] at (+1.50,-0.50) {};
+		\node[box] at (-1.50,-1.50) {};
+		\node[box] at (-0.50,-1.50) {};
+		\node[box] at (+0.50,-1.50) {};
+		\node[box] at (+1.50,-1.50) {};
+		\end{tikzpicture}
+	\end{subfigure}
+	{\LARGE$\xrightarrow{Luego de Ciclo Columna}$}
+	\begin{subfigure}[b]{0.27\textwidth}
+		\centering
+		\begin{tikzpicture}
+		    [%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		        box/.style={rectangle,draw=black,thick, minimum size=1cm},
+		    ]%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\draw[step=1cm,color=gray] (-2,-2) grid (2,2);
+		\node[box] at (-1.5,+1.50) {};
+		\node[box] at (-0.50,+1.50) {};
+		\node[box] at (+0.50,+1.50) {};
+		\node[box] at (+1.5,+1.50) {};
 
-El tema viene ahora en que hay que ir switcheando los cuadrantes donde voy insertando los píxeles resultantes cada uno fila. Siendo esta parte del código la que se encarga de swtichear $R8$ y $R9$ entre los distintos cuadrantes se utiliza para ello una variable puente para no sobrescribir ni pisar ningún valor. 
+		\node[box, fill=yellow] at (-1.5,+0.50) {R10};
+		\node[box] at (-0.50,+0.50) {};
+		\node[box] at (+0.50,+0.50) {R11};
+		\node[box] at (+1.50,+0.50) {};
 
-Snippet del código :
+		\node[box, fill=red] at (-1.50,-0.50) {R08};
+		\node[box] at (-0.50,-0.50) {};
+		\node[box, fill=orange] at (+0.50,-0.50) {R09};
+		\node[box] at (+1.50,-0.50) {};
+
+		\node[box] at (-1.50,-1.50) {};
+		\node[box] at (-0.50,-1.50) {};
+		\node[box] at (+0.50,-1.50) {};
+		\node[box] at (+1.50,-1.50) {};
+
+		\end{tikzpicture}
+	\end{subfigure}
+	\caption{Lugar que ocupan los registros $R8,R9,R10,R11$ antes y luego del cambio de fila}
+	\label{fourCombine_rowchange}
+\end{figure}
+
+En cuando a que pasa cuando la iteración sobre la columna se termina y se pasa a una nueva fila se realizan lo siguiente :
+\begin{itemize}
+
+\item El R8 toma el valor de R9
+
+\item El valor de R9 se el valor de la mitad de una fila 
+
+\item Se switchea R8 R9 por R10 R11 reespectivamente
+\end{itemize}
+
+Snippet del código del switch:
 
 \begin{lstlisting}
 	mov rax, r8
@@ -303,7 +366,7 @@ Snippet del código :
 	mov r11, rax
 \end{lstlisting}
 
-Lo único que cambia de esta explicación con respecto a cuando el ancho no es multiplico de 8 es en este punto donde tenemos que cambiar de fila, ya que nos quedaron 4 píxeles sin procesar y como seria demasiado trabajoso holdearlos para poder trabajarlos en otra iteración posterior, lo mejor que nos ocurrió fue trabajarlos manualmente e insertarlos en el lugar donde les corresponde. Luego de esto se sigue con el paso recién explicado.
+Lo único que cambia de esta explicación con respecto a cuando el ancho no es multiplo de 8 es en este punto donde tenemos que cambiar de fila, ya que nos quedaron 4 píxeles sin procesar y como seria demasiado trabajoso holdearlos para poder trabajarlos en otra iteración posterior, lo mejor que nos ocurrió fue trabajarlos manualmente e insertarlos en el lugar donde les corresponde. Luego de esto se sigue con el paso recién explicado.
 
 
 \subsection{Análisis preliminar}
