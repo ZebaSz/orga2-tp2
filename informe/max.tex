@@ -173,7 +173,7 @@ Por último probamos cómo afectan las diferentes proporciones de tamaño, bási
 	\includegraphics[scale=0.5]{img/maxCloser_PARAM_SIZE.png}
 \end{center}
 
-Esta vez vemos una leve mejora en el que es más ancho, 2975394 vs 2956806, el ancho corre en el $99.3\%$, la verdad que es un muy poca la diferencia, esto podría provenir de dibujar las primeras 3 filas y las ultimas son mas fácil de pintar porque no se calcula nada(las filas blancas) y si son más anchas, vamos a poner mas pixeles dentro de estas(la cantidad de píxeles blancos es la misma pero en el otro están concentrados en las primeras y últimas columnas) 
+Esta vez vemos una leve mejora en el que es más ancho, 2975394 vs 2956806, el ancho corre en el $99.3\%$, la verdad que es un muy poca la diferencia, esto podría provenir de dibujar las primeras 3 filas y las ultimas son mas fácil de pintar porque no se calcula nada(las filas blancas) y si son más anchas, vamos a poner mas pixeles dentro de estas(la cantidad de píxeles blancos es la misma pero en el otro están concentrados en las primeras y últimas columnas). Con estos resultados, podemos afirmar que sabemos como se va a comportar el algoritmo, ya que los parametros (salvo la cantidad de píxeles) no nos afectan en el rendimiento.
 
 \subsubsection*{Unrolling}
 
@@ -185,4 +185,4 @@ En este experimento, nuevamente aplicamos la técnica de unrolling de ciclos, so
 	\includegraphics[scale=0.5]{img/maxCloser_Unroll_big.png} %5120x5120
 \end{center}
 
-Hay una mejora, pero en comparación a lo que tarda el algoritmo es muy poca, para la imagen de 512x512 resulto en una mejora del $4\%$ y y para la imagen de 5120x5120 hay una mejora del $5\%$, que no es mucho pero si estamos en una imagen muy grande o tenemos que optimizar mucho podria llegar a valer la pena.
+Hay una mejora, pero en comparación a lo que tarda el algoritmo es muy poca, para la imagen de 512x512 resulto en una mejora del $4\%$ y y para la imagen de 5120x5120 hay una mejora del $5\%$, que no es mucho pero si estamos en una imagen muy grande o tenemos que optimizar mucho podria llegar a valer la pena. 
