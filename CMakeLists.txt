@@ -34,6 +34,7 @@ if(CMAKE_ASM_NASM_COMPILER_LOADED)
             #src/filters/ASM_convert_1pixel.asm
             #src/filters/ASM_linearZoom_shuf.asm
             #src/filters/ASM_fourCombine_antiCache.asm
+            #src/filters/ASM_maxCloser5.asm
     )
     set(CMAKE_ASM_NASM_FLAGS "${CMAKE_ASM_NASM_FLAGS} -f elf64 -g -F DWARF")
 endif(CMAKE_ASM_NASM_COMPILER_LOADED)

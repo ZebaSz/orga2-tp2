@@ -12,7 +12,7 @@ extern C_maxCloser
 ; rdi(uint8_t* src), esi(uint32_t srcw), edx(uint32_t srch),
 ; rcx(uint8_t* dst), r8d (uint32_t dstw), r9d(uint32_t dsth), xmm0(float val)
 
-ASM_maxCloser5:
+ASM_maxCloser:
 push rbp
 mov rbp, rsp
 push rbx
