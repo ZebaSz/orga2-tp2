@@ -10,7 +10,7 @@
 
 void C_maxCloser(uint8_t* src, uint32_t srcw, uint32_t srch,
                  uint8_t* dst, uint32_t dstw, uint32_t dsth __attribute__((unused)), float val) {
-    uint32_t kernelOff = 5;
+    int32_t kernelOff = 5;
     RGBA blanco;
     blanco.a = 255;
     blanco.r = 255;
@@ -20,7 +20,7 @@ void C_maxCloser(uint8_t* src, uint32_t srcw, uint32_t srch,
     RGBA (*mDst)[dstw] = (RGBA (*)[dstw]) dst;
     for(uint32_t h = 0; h < srch; h++) {
         for(uint32_t w = 0; w < srcw; w++) {
-            if (h < kernelOff || w < kernelOff || h > srch - (kernelOff + 1) || w > srcw - (kernelOff + 1)){
+            if (h < kernelOff || w < kernelOff || h > srch - (kernelOff - 1) || w > srcw - (kernelOff - 1)){
                 mDst[h][w] = blanco;
             } else {
 
