@@ -21,7 +21,9 @@ set(FILTER_FILES
         src/filters/C_linearZoom.c
         src/filters/C_maxCloser.c
         src/filters/filter_toX.c
-        src/filters/filters.h)
+        src/filters/filters.h
+        #src/filters/C_maxCloser5.c
+    )
 
 enable_language(ASM_NASM)
 if(CMAKE_ASM_NASM_COMPILER_LOADED)
