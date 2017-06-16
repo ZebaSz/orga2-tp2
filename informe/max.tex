@@ -1,37 +1,26 @@
 \section{Maximo cercano}
 
-%[DONE]Descripción:
-%	Fijensé si no queda mejor utilizar enumerates para describir los pasos a realizar para aplicar el filtro.[DONE]
-%[DONE]Implementación:
-%	Necesitaría una re-escritura. Es difícil de seguir a veces, no es muy clara.[DONE]
-%	Al principio describís lo que parecería ser el filtro en C. La división entre la explicación de cada implementación no queda muy clara.[DONE]
-%	Dicen que utilizan 4 píxeles en un registro, y 4 en el otro. No describen si son contiguos o si es la fila inferior.[DONE]
-%Análisis preliminar
-%	No tiene mucho sentido tener dos gráficos, uno con O3 y otro sin O3. [DONE]
-%	Sería interesante tener como resultado cuán mejor en tiempo una implementación contra la otra. [DONE]
-%Experimentación
-%	Lo que quieren ver es cuán diferente va a ser temporalmente cada una de las implementaciones, y eso no está claro en los gráficos.
-%		No hablan sobre alguna característica observable en el gráfico en relación al tamaño de la entrada, sólo comentan cuántas veces más rápido es.
-%		No está claro con ver en los gráficos que es 2.5, 1.4, o 1.2 veces más rápido, deberían cambiarlos por otros donde la comparación sea evidente. Lo que comentan debe estar respaldado y ser fácil de corroborar a simple vista.
-%	Falta experimentación.
-
 Este es un filtro tal que cada pixel de la imagen original se edita de la siguiente manera:
 
 \begin{enumerate}
-	\item Obtenemos los píxeles de alrededor, que se encuentren a una distancia menor a 3 píxeles.
-	\item Se calcula el máximo valor para cada componente entre estos píxeles obtenidos.
-	\item Se genera un nuevo píxel con estas 3 valores encontrados.
-	\item El píxel final se calcula mediante una combinación lineal entre el píxel original y el píxel que contiene las componentes máximas.
+	\item Obtenemos los pixeles de alrededor, que se encuentren a una distancia de 3 pixeles o menos. A esto lo denominamos kernel, en este caso, de 7x7.
+
+	\item Se calcula el máximo valor para cada componente entre estos pixeles obtenidos.
+
+	\item Se genera un nuevo pixel con estos 3 valores encontrados.
+
+	\item El pixel final se calcula mediante una combinación lineal entre el pixel original y el pixel que contiene las componentes máximas.
+
+	\item Aquellos pixeles para los cuales no se puede armar un kernel de 7x7 alrededor (las primeras y últimas 3 columas y 3 filas de la imagen) deben ser pintados de blanco.
 \end{enumerate}
 
-El conjunto de píxeles en donde se busca el máximo valor de cada componente, se lo conoce como kernel y en este caso es de 7x7 píxeles.\\
-La combinación lineal entre los píxeles se hace de la siguiente manera:
+La combinación lineal entre los pixeles se hace de la siguiente manera:
 
 \begin{center}
 	$src * (1 - val) + max * (val)$
 \end{center}
 
-Donde $src$ es el píxel original, $max$ es el píxel generado, y $val$ es un número flotante entre 0 y 1, este mismo es un parámetro del filtro.
+Donde $src$ es el pixel original, $max$ es el pixel generado, y $val$ es un número flotante entre 0 y 1, este mismo es un parámetro del filtro.
 
 \begin{table}[h]
 \centering
@@ -46,28 +35,26 @@ Donde $src$ es el píxel original, $max$ es el píxel generado, y $val$ es un n�
  & \cellcolor[HTML]{FAFE8E}$P_{60}$ & \cellcolor[HTML]{FAFE8E}$P_{61}$  & \cellcolor[HTML]{FAFE8E}$P_{62}$  & \cellcolor[HTML]{FAFE8E}$P_{63}$  & \cellcolor[HTML]{FAFE8E}$P_{64}$  & \cellcolor[HTML]{FAFE8E}$P_{65}$ & \cellcolor[HTML]{FAFE8E}$P_{66}$ &  \\ \hline
  & \multicolumn{1}{l|}{}      & \multicolumn{1}{l|}{}      & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}       & \multicolumn{1}{l|}{}      &
 \end{tabular}
-\caption{Kernel, en rojo el pixel que estamos editando y en amarillo los píxeles que forman parte del kernel}
+\caption{Kernel, en rojo el pixel que estamos editando y en amarillo los pixeles que forman parte del kernel}
 \end{table}
 
 
 \subsection{Implementación}
-
-Para la implementación de este filtro, recorremos la imagen original, iterando sobre sus filas y sus columnas, como hay píxeles que no tenemos un kernel de 7x7 alrededor, estos los pintamos de blanco, pero si podemos, iteramos sobre el kernel y nos vamos fijando cuáles son las componentes máximas y cuando recorrimos todo el kernel, para cada componente hacemos esta cuenta: \\ Componente Destino $\leftarrow$ Componente Original * (1 - VAL) + Componente Máxima * VAL. (Donde VAL es el parámetro que nos pasan en la función).
  
-La implementación en C se trató de hacerla lo más simple posible. Iteramos las filas y las columnas, y en cada paso preguntamos si el píxel se encuentra en el margen de 3 píxeles, si es así, lo pintamos de blanco, y si no, nos generamos un píxel con cada componente inicializada en el mínimo valor(0) y recorremos el kernel y usamos este píxel que acabamos de generar para usarlo de máximo actual, entonces vamos modificando cada componente cuando encontramos un valor mayor al encontrado, una vez iterado el kernel realizamos la combinación lineal sobre cada componente y guardamos el píxel en la imagen destino.
+La implementación en C se trató de hacer lo más simple posible. Iteramos las filas y las columnas, y en cada paso preguntamos si el pixel se encuentra en el margen de 3 pixeles. Si es así, lo pintamos de blanco; si no, nos generamos un pixel con cada componente inicializada en el mínimo valor(0) y recorremos el kernel y usamos este pixel que acabamos de generar para usarlo de máximo actual,  modificando cada componente cuando encontramos un valor mayor al actual. Una vez iterado el kernel realizamos la combinación lineal sobre cada componente y guardamos el pixel en la imagen destino.
  
-En cambio, en la implementación del filtro en lenguaje ensamblador, esta se ve complejizada ya que podemos aprovechar de las ventajas que nos brinda el modelo SIMD. En particular, los registros XMM son de 16 bytes, que los podemos utilizar para procesar 4 píxeles en paralelo. Para esta implementación, vamos a aprovechar estos registros para buscar el máximo sobre el kernel y hacer la combinación lineal sobre cada componente en paralelo.
+En cambio, en la implementación del filtro en lenguaje ensamblador, esta se ve complejizada ya que podemos aprovechar de las ventajas que nos brinda el modelo SIMD. En particular, los registros XMM son de 16 bytes, que los podemos utilizar para procesar 4 pixeles en paralelo. Para esta implementación, vamos a aprovechar estos registros para buscar el máximo sobre el kernel y hacer la combinación lineal sobre cada componente en paralelo.
  
-En este caso también vamos a iterar sobre las filas y las columnas, primero recorremos las filas y vamos a diferenciar 2 casos, el caso en que toda la fila se encuentra en el margen que se pinta de blanco y el que no.
+En este caso primero recorremos las filas y diferenciamos 2 casos: el caso en que toda la fila se encuentra en el margen que se pinta de blanco y el que no.
  
-Si es una fila blanca, vamos a intentar guardar la mayor cantidad de píxeles contiguos posible, como ya vimos que en los registros XMM nos caben 4, nos generamos un registro tal que los 4 píxeles sean blancos y guardarlos en memoria a la vez, al ser imágenes con ancho múltiplo de 4, podemos aplicar esto sobre toda la fila, entonces iteramos sobre las columnas pero vamos aumentando en 4 el índice de la columna. Con esto logramos en las primeras filas y las últimas una reducción al iterar las columnas.
+Si es una fila blanca, vamos a intentar guardar la mayor cantidad de pixeles contiguos posible. Como ya vimos que en los registros XMM nos caben 4, nos generamos un registro tal que los 4 pixeles sean blancos y guardarlos en memoria a la vez, al ser imágenes con ancho múltiplo de 4. Podemos aplicar esto sobre toda la fila, iterando de a 4 columnas pero vez. Con esto logramos en las primeras filas y las últimas una reducción al iterar las columnas.
  
-Ahora sí es una fila que no va a pertenecer en su completitud al margen, vamos a tener que calcular el máximo de cada color en el kernel y después hacer la combinación lineal. En la iteración del kernel, en diferencia a C, podemos guardarnos 4 píxeles tal que puedan ser los máximos, vamos a hacer uso de la instrucción PMAXUB, que compara byte a byte entre los registros y guarda el máximo en el registro destino. Gracias a esta instrucción podemos ir comparando estos 4 posibles máximos contra 4 píxeles contiguos del kernel (notar que la comparación es byte a byte, así que va a comparar las componentes), e ir manteniendo los máximos. Como en el kernel tenemos nada más 7 píxeles contiguos, vamos a aplicar este método 2 veces por fila, repitiendo un píxel de la fila en cada aplicación total esto no va a afectar el resultado.
+Si es una fila que no va a pertenecer en su completitud al margen, vamos a tener que calcular el máximo de cada color en el kernel y después hacer la combinación lineal. En la iteración del kernel, en diferencia a C, podemos guardarnos en un solo registro 4 pixeles tal que puedan ser los máximos. Para esto usamos la instrucción PMAXUB, que compara byte a byte entre los registros y guarda el máximo en el registro destino. Gracias a esta instrucción podemos ir comparando estos 4 posibles máximos contra 4 pixeles contiguos del kernel e ir manteniendo los máximos parciales. Cabe destacar que la comparación es byte a byte, así que va a comparar las componentes sin desempaquetarlas. Como en el kernel tenemos nada más 7 pixeles contiguos, vamos a aplicar este método 2 veces por fila, repitiendo un pixel de la fila en cada aplicación sin que esto afecte el resultado final.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics{img/max/filaKernel.pdf}
-	\caption{Píxeles contiguos de una fila del kernel, las llaves indican que píxeles se toman en las 2 aplicaciones por fila}
+	\caption{pixeles contiguos de una fila del kernel, las llaves indican que pixeles se toman en las 2 aplicaciones por fila}
 \end{figure}
 
 \begin{center}
@@ -83,7 +70,7 @@ Ahora sí es una fila que no va a pertenecer en su completitud al margen, vamos 
 	$MAX(PM,P)$ = \xmmDoubleWordSmall{\tiny$MAX(PM^r,P^r)$}{\tiny$MAX(PM^g,P^g)$}{\tiny$MAX(PM^b,P^b)$}{\tiny$MAX(PM^a,P^a)$}
 \end{center}
 
-Una vez realizado esto sobre cada fila, vamos a tener en el registro los cuatro posibles píxeles máximos, ahora debemos compararlos entre sí para conseguir el píxel que contenga el máximo de cada componente. Para esto podemos seguir usando PMAXUB, duplicamos el registro y shifteamos 8 bytes a la derecha uno de ellos, para que nos quede desplazado 2 píxeles y podamos comparar el primer par de píxeles del registro contra el segundo par. Todavía nos queda por comparar 2 píxeles así que repetimos este procedimiento pero esta vez desplazamos un solo píxel, una vez realizado esto nos va a quedar en la parte menos significativa del registro el píxel que estábamos buscando.
+Una vez realizado esto sobre cada fila, vamos a tener en el registro los cuatro posibles pixeles máximos. Los mismos son comparados entre sí para conseguir el pixel definitivo que contenga el máximo de cada componente. Para esto podemos seguir usando PMAXUB, duplicamos el registro y shifteamos 8 bytes a la derecha uno de ellos, para que nos quede desplazado 2 pixeles y podamos comparar el primer par de pixeles del registro contra el segundo par. Repetimos este proceso desplazando 4 bytes para comparar los últimos 2 pixeles. Una vez realizado esto nos va a quedar en la parte menos significativa del registro el pixel que estábamos buscando.
 
 \begin{center}
 	\xmm{1} \xmmDoubleWordSmall{$M_1$}{$M_2$}{$M_3$}{$M_4$}
@@ -114,7 +101,7 @@ Una vez realizado esto sobre cada fila, vamos a tener en el registro los cuatro 
 	\vspace{0.1cm}
 \end{center}
 
-Ya conseguido el máximo, ahora tenemos que realizar la combinación lineal con el píxel original, el nuevo píxel que generamos y el parámetro. Lo que queremos es hacer la cuenta para cada componente paralelo, para eso, podemos usar instrucciones SIMD para multiplicar las componentes de los píxeles en paralelo por el parámetro, que es un float, entonces convertimos a float cada componente quedándonos todas las componentes en un registro XMM, y para multiplicarlas por el parámetro tenemos que hacer un registro XMM que lo contenga 4 veces y aplicamos MULPS, quedando de resultado la multiplicación por cada componente contra el parámetro cada una en floats. Luego hacemos lo mismo con el píxel original, y sumamos estos dos resultados. Ahora nos queda guardar este resultado en la imagen destino, pero antes, debemos convertir los floats a integers. Ya guardado en memoria, podes seguir repitiendo el paso para los otros píxeles.
+Ya conseguido el máximo, ahora tenemos que realizar la combinación lineal entre el pixel original, el nuevo pixel que generamos y el parámetro. Lo que queremos es hacer la cuenta para cada componente en paralelo: para esto podemos usar instrucciones SIMD para multiplicar las componentes de los pixeles en paralelo por el parámetro. Como el mismo es un valor decimal (\texttt{float}), convertimos cada componente \texttt{float} quedándonos todas las componentes en un registro XMM. Para multiplicarlas por el parámetro, armamos un registro XMM que lo contenga 4 veces y aplicamos MULPS, quedando de resultado la multiplicación por cada componente contra el parámetro cada una en floats. Luego realizamos un proceso análogo con el pixel original y $1 - val$, y sumamos estos dos resultados. Convertimos este resultado de vuelta a enteros y lo guardamos en la imagen destino, continuamos con el resto de los pixeles.
 
 \subsection{Análisis preliminar}
 
@@ -122,7 +109,9 @@ Ya conseguido el máximo, ahora tenemos que realizar la combinación lineal con 
 	\includegraphics[scale=0.5]{img/maxCloser_CvsASMvsO3.png}
 \end{center}
 
-Podemos ver claramente como el filtro implementado en ASM corre más rápido que en C, de hecho, al incrementar el tamaño de la imagen la diferencia es aún más notable. Si bien hay una amplia mejora al compilar con optimizaciones \texttt{-O3}, no llega a mejorar la versión de ASM.
+Una vez más, este filtro se comporta de manera lineal con respecto al tamaño de la imagen en pixeles, independientemente de la implementación usada. Para cada pixel deben procesarse 49 pixeles (por el kernel de 7x7), pero esta cantidad es fija, por lo cual es lógico asumir que el filtro sea lineal. Por otro lado, para el caso del margen blanco (que implica unicamente procesar el pixel original), la cantidad de pixeles abarcada es muy poca para que estos tengan un impacto visible en la performance.
+
+También podemos ver claramente como el filtro implementado en ASM corre más rápido que en C, de hecho, al incrementar el tamaño de la imagen la diferencia es aún más notable. Si bien hay una amplia mejora al compilar con optimizaciones \texttt{-O3}, no llega a mejorar la versión de ASM.
 
 \begin{center}
 	\includegraphics[scale=0.5]{img/maxCloser_CvsASMvsO3_bars.png}
@@ -135,7 +124,7 @@ Esto es un comportamiento esperable ya que en C estamos yendo a buscar el pixel 
 \subsection{Experimantación}
 Como reveló el análisis preliminar, la cantidad de pixeles origen a procesar por pixel destino tuvo un gran impacto en la performance de nuesto filtro. Decidimos ver cómo impacta en ambas implementaciones si agrandamos el tamaño de kernel. Para esto corrimos los mismos tests que antes, pero ahora con un kernel de 11x11 en vez que de 7x7.
 
-Nuestra hipótesis fue que esta medida afectaría con más contundencia a la implementación de C, si bien en ASM va a tardar más, en relación al kernel mas chico, no le va afectar tanto. Esto es debido a que en C trae cada pixel del kernel uno por vez, y como estamos incrementando el tamaño del kernel en casi 2.5 veces, esperamos una performance peor en este orden. Pero en ASM aprovechando la paralelización de datos, levantamos 11 píxeles con 3 llamadas a memoria nada más.
+Nuestra hipótesis fue que esta medida afectaría con más contundencia a la implementación de C, si bien en ASM va a tardar más, en relación al kernel mas chico, no le va afectar tanto. Esto es debido a que en C trae cada pixel del kernel uno por vez, y como estamos incrementando el tamaño del kernel en casi 2.5 veces, esperamos una performance peor en este orden. Pero en ASM aprovechando la paralelización de datos, levantamos 11 pixeles con 3 llamadas a memoria nada más.
 
 % TODO: medir esto de nuevo, asegurarse de usar O3, conservar datos en jupyter
 
@@ -149,9 +138,9 @@ Si observamos los gráficos, podemos ver como en C con el kernel de 11x11 tarda 
 
 \subsubsection*{Análisis de las variables de entrada}
 
-Queremos realizar un análisis sobre el tiempo en que tarda en terminar el filtro en base a los parámetros que recibe, distintos tipos de imagen, tamaños y el valor que afecta la combinación lineal. Nuestra hipótesis es que las pruebas que hacemos no van a tener un impacto significativo sobre el rendimiento del filtro, ya que no hay optimizaciones que hagan variar el tiempo final según los parámetros(si la cantidad de píxeles como vimos en el análisis preliminar).
+Queremos realizar un análisis sobre el tiempo en que tarda en terminar el filtro en base a los parámetros que recibe, distintos tipos de imagen, tamaños y el valor que afecta la combinación lineal. Nuestra hipótesis es que las pruebas que hacemos no van a tener un impacto significativo sobre el rendimiento del filtro, ya que no hay optimizaciones que hagan variar el tiempo final según los parámetros(si la cantidad de pixeles como vimos en el análisis preliminar).
 
-Primero hagamos un análisis sobre distintas imágenes y cómo reacciona el algoritmo frente a ellas, en este caso vamos a comparar las imágenes de lena y colores (las de los tests de la cátedra), una de los siguientes colores azul, rojo, verde, gris, blanco y negro y por último una imagen generada aleatoriamente(en python), donde cada píxel es de un color elegido aleatoriamente distribuido uniformemente. Para la experimentación se dejó fijo en todas las imágenes el tamaño(512x512), el valor de la combinación final en 0.5, y se corrió la experimentación unas 100 veces y para cada color nos quedamos con el que menor tiempo resultó.
+Primero hagamos un análisis sobre distintas imágenes y cómo reacciona el algoritmo frente a ellas, en este caso vamos a comparar las imágenes de lena y colores (las de los tests de la cátedra), una de los siguientes colores azul, rojo, verde, gris, blanco y negro y por último una imagen generada aleatoriamente(en python), donde cada pixel es de un color elegido aleatoriamente distribuido uniformemente. Para la experimentación se dejó fijo en todas las imágenes el tamaño(512x512), el valor de la combinación final en 0.5, y se corrió la experimentación unas 100 veces y para cada color nos quedamos con el que menor tiempo resultó.
 
 \begin{center} 
 	\includegraphics[scale=0.5]{img/maxCloser_PARAM_IMG.png}
@@ -167,13 +156,13 @@ El siguiente experimento fue sobre el parámetro de entrada de punto flotante qu
 
 De nuevo podemos observar la poca varianza entre los distintos valores, el que menos ticks dió fue el de 0.5 con 12335487 ticks y el que mayor fue el de 1 con 12416301 ticks, la diferencia entre estos dos representa el $0,65\%$ de este último. Con estos resultados podemos afirmar que no hay diferencia significativa.
 
-Por último probamos cómo afectan las diferentes proporciones de tamaño, básicamente queremos ver como afecta si la imagen es más ancha que alta, en este caso probamos para las imágenes de lena y colores,  con el valor fijo en 0.5 y probamos para tamaños de 512x128 y 128x512 ya que tienen la misma cantidad de píxeles.
+Por último probamos cómo afectan las diferentes proporciones de tamaño, básicamente queremos ver como afecta si la imagen es más ancha que alta, en este caso probamos para las imágenes de lena y colores,  con el valor fijo en 0.5 y probamos para tamaños de 512x128 y 128x512 ya que tienen la misma cantidad de pixeles.
 
 \begin{center} 
 	\includegraphics[scale=0.5]{img/maxCloser_PARAM_SIZE.png}
 \end{center}
 
-Esta vez vemos una leve mejora en el que es más ancho, 2975394 vs 2956806, el ancho corre en el $99.3\%$, la verdad que es un muy poca la diferencia, esto podría provenir de dibujar las primeras 3 filas y las ultimas son mas fácil de pintar porque no se calcula nada(las filas blancas) y si son más anchas, vamos a poner mas pixeles dentro de estas(la cantidad de píxeles blancos es la misma pero en el otro están concentrados en las primeras y últimas columnas). Con estos resultados, podemos afirmar que sabemos como se va a comportar el algoritmo, ya que los parametros (salvo la cantidad de píxeles) no nos afectan en el rendimiento.
+Esta vez vemos una leve mejora en el que es más ancho, 2975394 vs 2956806, el ancho corre en el $99.3\%$, la verdad que es un muy poca la diferencia, esto podría provenir de dibujar las primeras 3 filas y las ultimas son mas fácil de pintar porque no se calcula nada(las filas blancas) y si son más anchas, vamos a poner mas pixeles dentro de estas(la cantidad de pixeles blancos es la misma pero en el otro están concentrados en las primeras y últimas columnas). Con estos resultados, podemos afirmar que sabemos como se va a comportar el algoritmo, ya que los parametros (salvo la cantidad de pixeles) no nos afectan en el rendimiento.
 
 \subsubsection*{Unrolling}
 

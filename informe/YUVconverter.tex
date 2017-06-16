@@ -67,7 +67,18 @@ Primero, se definen 3 máscaras. Cada una se utilizará para crear una de las co
 
 Ya que contamos con registros de 128 bits y cada pixel mide 32 bits de ancho (RGBA), podemos cargar 4 pixeles de la memoria por iteración. Esto permite reducir el impacto de los accesos a memoria y los saltos condicionales.
 
-No obstante, los mismos son desempaquetados para ocupar los registros XMM de manera individual, con cada una de sus componentes en tamaño doubleword (32 bits). Esto es porque los valores que multiplicamos y sumamos pueden exceder el límite de una word, y perderíamos precisión o retornaríamos valores inválidos. Esto también se refleja en la implementación C, donde consideramos utilizar \texttt{unsigned short}, de 16 bits, pero esto generaba demasiados errores y nos vimos forzados a usar \texttt{unsigned int}, de 32 bits.
+No obstante, los mismos son desempaquetados para ocupar los registros XMM de manera individual, con cada una de sus componentes en tamaño doubleword (32 bits). Esto es porque los valores que multiplicamos y sumamos pueden exceder el límite de una word con signo, y perderíamos precisión o retornaríamos valores inválidos. Por ejemplo, para el caso RGB2YUV, si un pixel fuese (255,255,255), la componenete Y sería
+
+\begin{center}
+
+	$Y = sature(((66 * 255 + 129 * 255 + 25 * 255 + 128) >> 8) + 16)$
+
+	$Y = sature((220*255 >> 8) + 16)$
+
+	$220 * 255 = 56100 > 32768 = 2^{15}$
+\end{center}
+
+Esto también se refleja en la implementación C, donde consideramos utilizar \texttt{short}, de 16 bits, pero esto generaba demasiados errores y nos vimos forzados a usar \texttt{int}, de 32 bits.
 
 Por lo tanto, la lógica de procesamiento de cada pixel se ve repetida 4 veces, una por pixel por iteración. Sin embargo, tenemos la garantía que la imagen tendrá como ancho un múltiplo de 4, por lo que esto no presenta un problema.
 
@@ -141,7 +152,7 @@ Por último, estos valores intermedios se suman horizontalmente para crear las c
 
 Como se puede ver, al sumar se genera un valor duplicado al final. El mismo se genera porque las imagenes tienen 3 componentes y \texttt{PHADDD} toma siempre 2 parámetros. Esto no afecta la correción del filtro, ya que no estamos trabajando con el componente alfa y el mismo puede ser descartado.
 
-Por último, estos componentes se denotan con $'$ porqe los mismos no son los valores finales: debemos aplicar 2 sumas y un shift a todos los componentes para finalizar la conversión. Para las sumas utilizamos nuevamente constantes precargadas en un registro XMM.
+Por último, estos componentes se denotan con $'$ porque los mismos no son los valores finales: debemos aplicar 2 sumas y un shift a todos los componentes para finalizar la conversión. Para las sumas utilizamos nuevamente constantes precargadas en un registro XMM.
 
 Al finalizar la conversión, los pixeles son reempaquetados para ser guardados en una sola operación. El empaquetado es sin signo, de manera que cualquier valor por encima del máximo es acotado al máximo de dicha componente (\texttt{0xFF}):
 
