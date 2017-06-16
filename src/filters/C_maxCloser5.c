@@ -10,7 +10,7 @@
 
 void C_maxCloser(uint8_t* src, uint32_t srcw, uint32_t srch,
                  uint8_t* dst, uint32_t dstw, uint32_t dsth __attribute__((unused)), float val) {
-    int32_t kernelOff = 5;
+    uint32_t kernelOff = 5;
     RGBA blanco;
     blanco.a = 255;
     blanco.r = 255;
